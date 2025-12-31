@@ -75,27 +75,33 @@
 
                     <div class="flex items-center gap-3 pl-6 border-l border-gray-200">
                         @auth
-                        <div class="relative group">
+                        <div class="relative group h-full flex items-center">
                             <button
-                                class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-primary focus:outline-none">
+                                class="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-primary focus:outline-none py-2">
                                 <span>{{ Str::limit(auth()->user()->name, 10) }}</span>
-                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
+                                <svg class="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
-                            <div
-                                class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block border border-gray-100">
-                                @if(auth()->user()->is_admin)
-                                <a href="{{ route('admin.dashboard') }}"
-                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">Admin Dashboard</a>
-                                @endif
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit"
-                                        class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">Logout</button>
-                                </form>
+
+                            <div class="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
+                                <div class="bg-white rounded-md shadow-lg py-1 border border-gray-100">
+                                    @if(auth()->user()->is_admin)
+                                    <a href="{{ route('admin.dashboard') }}"
+                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-primary transition-colors">
+                                        Admin Dashboard
+                                    </a>
+                                    @endif
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit"
+                                            class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                            Logout
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         @else
