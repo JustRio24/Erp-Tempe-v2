@@ -102,7 +102,7 @@
                     <div class="space-y-4">
                         <div
                             class="border rounded-xl p-4 has-[:checked]:border-primary has-[:checked]:bg-green-50 transition-colors">
-                            <label class="flex items-center cursor-pointer mb-3">
+                            <label class="flex items-center cursor-pointer mb-2">
                                 <input type="radio" name="metode_pembayaran" value="transfer_bank"
                                     class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" {{
                                     old('metode_pembayaran', 'transfer_bank' )==='transfer_bank' ? 'checked' : '' }}
@@ -110,15 +110,37 @@
                                 <span class="ml-3 font-bold text-gray-900">Transfer Bank</span>
                             </label>
 
-                            <div id="bank-selection-container" class="ml-7 mt-2 transition-all duration-300">
-                                <select name="bank_tujuan"
-                                    class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary text-sm bg-white">
-                                    <option value="">-- Pilih Bank Tujuan --</option>
+                            <div id="bank-selection-container" class="ml-7 mt-2 relative">
+                                <input type="hidden" name="bank_tujuan" id="bank_tujuan_input"
+                                    value="{{ old('bank_tujuan') }}">
+
+                                <button type="button" id="custom-dropdown-trigger" onclick="toggleCustomDropdown()"
+                                    class="w-full bg-white border border-gray-300 rounded-lg py-2.5 px-4 text-left flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
+                                    <span id="selected-bank-text"
+                                        class="text-sm {{ old('bank_tujuan') ? 'text-gray-900 font-medium' : 'text-gray-500' }}">
+                                        @if(old('bank_tujuan') && isset($banks[old('bank_tujuan')]))
+                                        {{ $banks[old('bank_tujuan')] }}
+                                        @else
+                                        -- Pilih Bank Tujuan --
+                                        @endif
+                                    </span>
+                                    <svg id="dropdown-arrow"
+                                        class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+
+                                <div id="custom-dropdown-options"
+                                    class="hidden absolute z-20 w-full mt-1 bg-white border border-green-200 rounded-xl shadow-lg max-h-60 overflow-y-auto custom-scrollbar">
                                     @foreach($banks as $key => $bank)
-                                    <option value="{{ $key }}" {{ old('bank_tujuan')===$key ? 'selected' : '' }}>{{
-                                        $bank }}</option>
+                                    <div onclick="selectBank('{{ $key }}', '{{ $bank }}')"
+                                        class="px-4 py-3 text-sm cursor-pointer transition-colors border-b border-gray-50 last:border-0 hover:bg-green-50 hover:text-primary {{ old('bank_tujuan') === $key ? 'bg-green-50 text-primary font-bold' : 'text-gray-700' }}">
+                                        {{ $bank }}
+                                    </div>
                                     @endforeach
-                                </select>
+                                </div>
                             </div>
                         </div>
 
@@ -215,7 +237,7 @@
     const bankContainer = document.getElementById('bank-selection-container');
     const paymentRadios = document.querySelectorAll('input[name="metode_pembayaran"]');
 
-    // Logic: Hitung Ongkir
+    // 1. Logic Hitung Ongkir
     function updateTotals() {
         let shippingCost = 0;
         shippingRadios.forEach(radio => {
@@ -225,15 +247,13 @@
         });
 
         const total = subtotal + shippingCost;
-        
-        // Format Currency IDR
         const formatIDR = (num) => 'Rp ' + num.toLocaleString('id-ID');
 
         shippingDisplay.textContent = shippingCost === 0 ? 'Gratis' : formatIDR(shippingCost);
         grandTotalDisplay.textContent = formatIDR(total);
     }
 
-    // Logic: Toggle Bank Dropdown
+    // 2. Logic Tampilkan/Sembunyikan Dropdown Bank
     function toggleBankSelect(show) {
         if (show) {
             bankContainer.classList.remove('hidden', 'opacity-0', 'h-0');
@@ -244,12 +264,42 @@
         }
     }
 
-    // Event Listeners
+    // 3. CUSTOM DROPDOWN LOGIC (Agar warna hijau)
+    function toggleCustomDropdown() {
+        const dropdown = document.getElementById('custom-dropdown-options');
+        const arrow = document.getElementById('dropdown-arrow');
+        dropdown.classList.toggle('hidden');
+        arrow.classList.toggle('rotate-180');
+    }
+
+    function selectBank(value, label) {
+        // Update input hidden (yang dikirim ke server)
+        document.getElementById('bank_tujuan_input').value = value;
+        
+        // Update teks yang tampil
+        const textElement = document.getElementById('selected-bank-text');
+        textElement.textContent = label;
+        textElement.classList.remove('text-gray-500');
+        textElement.classList.add('text-gray-900', 'font-medium');
+        
+        // Tutup dropdown
+        toggleCustomDropdown();
+    }
+
+    // Tutup dropdown jika klik di luar
+    window.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('custom-dropdown-options');
+        const trigger = document.getElementById('custom-dropdown-trigger');
+        if (!trigger.contains(e.target) && !dropdown.contains(e.target) && !dropdown.classList.contains('hidden')) {
+            toggleCustomDropdown();
+        }
+    });
+
+    // Inisialisasi
     shippingRadios.forEach(radio => radio.addEventListener('change', updateTotals));
-    
-    // Initialize
     updateTotals();
-    // Check initial state for bank dropdown
+    
+    // Cek state awal (misal jika ada error validasi dan kembali ke halaman ini)
     const isTransfer = document.querySelector('input[name="metode_pembayaran"]:checked')?.value === 'transfer_bank';
     toggleBankSelect(isTransfer);
 
