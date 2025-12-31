@@ -1,59 +1,99 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem ERP UMKM Tempe 3 Puteri 🌿
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem ERP (Enterprise Resource Planning) yang dirancang khusus untuk UMKM Tempe 3 Puteri. Website ini mengintegrasikan modul Inventori, Produksi, Penjualan (E-commerce), dan Keuangan dalam satu platform yang user-friendly dan responsif.
 
-## About Laravel
+## ✨ Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 🏛️ Modul Admin (Dashboard Internal)
+- **Dashboard Terintegrasi**: Statistik real-time untuk stok, pesanan, dan laba rugi.
+- **Prakiraan Cuaca 7 Hari**: Integrasi WeatherAPI untuk membantu perencanaan produksi berdasarkan suhu (fermentasi tempe sangat bergantung pada cuaca).
+- **Manajemen Produk**: Kelola katalog, harga normal, harga grosir, dan penyesuaian stok manual.
+- **Siklus Produksi 4 Hari**: Pelacakan batch produksi tempe dari tahap peragian hingga panen dengan pencatatan kegagalan produksi.
+- **Manajemen Pesanan**: Proses pesanan masuk dari pelanggan dan update status pengiriman/pembayaran.
+- **Laporan Keuangan**: Pencatatan pengeluaran manual dan laporan laba rugi otomatis dari data penjualan.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 🛒 Modul Pelanggan (E-commerce)
+- **Katalog Produk**: Tampilan produk premium dengan detail lengkap dan info stok.
+- **Sistem Keranjang**: Penambahan produk ke keranjang belanja dengan perhitungan harga grosir otomatis.
+- **Guest Checkout**: Pelanggan dapat berbelanja tanpa harus login (registrasi opsional).
+- **Simulasi Pembayaran**: Pilihan metode Transfer Bank dan COD (Cash on Delivery).
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 🛠️ Tech Stack
+- **Framework**: Laravel 12
+- **Frontend**: Blade Templates, Tailwind CSS (via Breeze)
+- **Database**: MySQL
+- **Asset Bundler**: Vite
+- **Integrasi API**: WeatherAPI.com (Prakiraan Cuaca)
 
-## Learning Laravel
+## 🚀 Langkah Instalasi
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Ikuti langkah-langkah berikut untuk menjalankan project di lingkungan lokal:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 1. Persyaratan Sistem
+- PHP >= 8.2
+- Composer
+- Node.js & NPM
+- MySQL Database
 
-## Laravel Sponsors
+### 2. Clone Project & Install Dependencies
+```bash
+# Clone repository ini (jika ada) atau masuk ke direktori project
+cd Erp-Tempe-v2
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Install PHP dependencies
+composer install
 
-### Premium Partners
+# Install JS dependencies
+npm install
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 3. Konfigurasi Environment
+Salin file `.env.example` menjadi `.env` dan sesuaikan pengaturan database Anda:
+```bash
+cp .env.example .env
+```
+Edit bagian database di `.env`:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=tempe_db
+DB_USERNAME=root
+DB_PASSWORD=
 
-## Contributing
+# Tambahkan API Key WeatherAPI (Opsional untuk fitur cuaca)
+# WEATHER_API_KEY=ad6b5989479b485286390913252502
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4. Setup Database & Key
+```bash
+# Generate application key
+php artisan key:generate
 
-## Code of Conduct
+# Jalankan migrasi dan seeder awal
+php artisan migrate --seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 5. Build Assets & Jalankan Server
+```bash
+# Compile assets (Tailwind/Vite)
+npm run dev
 
-## Security Vulnerabilities
+# Jalankan web server Laravel (buka tab terminal baru)
+php artisan serve
+```
+Website dapat diakses di: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🔑 Akun Akses Default (Admin)
+- **Email**: `admin@tempe3puteri.local`
+- **Password**: `password`
 
-## License
+## 📂 Struktur Project Penting
+- `app/Http/Controllers/Admin`: Logika manajemen internal ERP.
+- `app/Models`: Definisi skema database dan relation (Produk, Batch, Order, Finance).
+- `app/Services`: WeatherService untuk integrasi API Cuaca.
+- `resources/views`: Template tampilan (Admin, Katalog, Cart, Checkout, Auth).
+- `routes/web.php`: Definisi semua route aplikasi.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+**UMKM Tempe 3 Puteri** - *Membawa Kualitas Tradisional ke Era Digital.*
