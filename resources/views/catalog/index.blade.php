@@ -3,50 +3,99 @@
 @section('title', 'Katalog Produk')
 
 @section('content')
-<div class="container">
-    <div style="margin-bottom: 2rem;">
-        <h1 style="color: var(--primary);">Katalog Produk Kami</h1>
-        <p style="color: #666;">Tempe berbagai variant terbaik untuk keluarga Anda</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <div class="text-center mb-10 max-w-2xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-serif font-bold text-primary mb-3">Katalog Produk Kami</h1>
+        <p class="text-gray-500 text-sm md:text-base">Temukan berbagai varian tempe terbaik, diolah secara higienis
+            untuk kebutuhan nutrisi keluarga Anda.</p>
     </div>
 
-    <div class="grid grid-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
         @forelse($products as $product)
-            <div class="product-card">
+        <div
+            class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
+
+            <a href="{{ route('catalog.show', $product) }}" class="relative h-56 bg-gray-100 overflow-hidden block">
                 @if($product->gambar)
-                    <img src="{{ asset('storage/'.$product->gambar) }}" alt="{{ $product->nama }}" class="product-image">
+                <img src="{{ asset('storage/'.$product->gambar) }}" alt="{{ $product->nama }}"
+                    class="w-full h-full object-cover transform group-hover:scale-110 transition duration-700">
                 @else
-                    <div class="product-image" style="background: linear-gradient(135deg, #2D5F3F, #4CAF50); display: flex; align-items: center; justify-content: center; color: white; font-size: 3rem;">
-                        🌿
-                    </div>
+                <div
+                    class="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-[#2D5F3F] to-[#4CAF50] text-white">
+                    <span class="text-5xl mb-2">🌿</span>
+                    <span class="text-xs font-medium opacity-80">Foto Belum Tersedia</span>
+                </div>
                 @endif
-                <div class="product-body">
-                    <h3 class="product-title">{{ $product->nama }}</h3>
-                    <p style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">{{ Str::limit($product->deskripsi, 100) }}</p>
-                    <div style="margin-bottom: 0.75rem;">
-                        <span style="font-size: 0.875rem; color: #888;">Stok: {{ $product->stok_tersedia }} {{ $product->satuan }}</span>
+
+                @if($product->harga_grosir && $product->minimal_grosir)
+                <div
+                    class="absolute top-3 left-3 bg-secondary text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md">
+                    Grosir Tersedia
+                </div>
+                @endif
+            </a>
+
+            <div class="p-5 flex flex-col flex-grow">
+                <div class="mb-4">
+                    <a href="{{ route('catalog.show', $product) }}">
+                        <h3
+                            class="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-1 mb-1">
+                            {{ $product->nama }}</h3>
+                    </a>
+                    <p class="text-gray-500 text-xs leading-relaxed line-clamp-2 h-8">{{ Str::limit($product->deskripsi,
+                        80) }}</p>
+                </div>
+
+                <div
+                    class="flex items-center justify-between mb-3 text-xs font-medium text-gray-400 bg-gray-50 p-2 rounded-lg">
+                    <span>Stok: <span class="{{ $product->stok_tersedia > 5 ? 'text-primary' : 'text-red-500' }}">{{
+                            $product->stok_tersedia }}</span></span>
+                    <span>/ {{ $product->satuan }}</span>
+                </div>
+
+                <div class="mb-4">
+                    <div class="text-xl font-bold text-primary">Rp {{ number_format($product->harga_normal, 0, ',', '.')
+                        }}</div>
+                    @if($product->harga_grosir)
+                    <div class="text-[10px] text-secondary font-medium">
+                        Beli {{ $product->minimal_grosir }}+ : Rp {{ number_format($product->harga_grosir, 0, ',', '.')
+                        }}
                     </div>
-                    <div class="product-price">Rp {{ number_format($product->harga_normal, 0, ',', '.') }}</div>
-                    @if($product->harga_grosir && $product->minimal_grosir)
-                        <p style="font-size: 0.875rem; color: var(--secondary); margin-bottom: 1rem;">
-                            Grosir ({{ $product->minimal_grosir }}+ {{ $product->satuan }}): Rp {{ number_format($product->harga_grosir, 0, ',', '.') }}
-                        </p>
                     @endif
-                    <form action="{{ route('cart.add', $product) }}" method="POST">
+                </div>
+
+                <div class="mt-auto pt-4 border-t border-gray-100">
+                    <form action="{{ route('cart.add', $product) }}" method="POST" class="flex gap-2">
                         @csrf
-                        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-                            <input type="number" name="quantity" value="1" min="1" max="{{ $product->stok_tersedia }}" class="form-control" style="width: 80px;">
-                            <button type="submit" class="btn btn-primary" style="flex: 1;">Tambah</button>
+                        <div class="w-16 relative">
+                            <input type="number" name="quantity" value="1" min="1" max="{{ $product->stok_tersedia }}"
+                                class="w-full text-center text-sm font-semibold border border-gray-300 rounded-lg py-2 focus:ring-1 focus:ring-primary focus:border-primary">
                         </div>
+                        <button type="submit"
+                            class="flex-1 bg-primary hover:bg-green-800 text-white text-sm font-semibold rounded-lg py-2 transition-colors flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            Tambah
+                        </button>
                     </form>
-                    <a href="{{ route('catalog.show', $product) }}" style="font-size: 0.875rem;">Lihat Detail →</a>
                 </div>
             </div>
+        </div>
         @empty
-            <p style="grid-column: 1 / -1; text-align: center; color: #666; padding: 3rem;">Belum ada produk tersedia</p>
+        <div class="col-span-full py-16 text-center">
+            <div class="bg-gray-50 rounded-2xl border border-dashed border-gray-300 p-10 inline-block">
+                <span class="text-4xl block mb-3">🍃</span>
+                <p class="text-gray-500 font-medium">Belum ada produk yang tersedia saat ini.</p>
+            </div>
+        </div>
         @endforelse
     </div>
 
-    <div style="margin-top: 2rem;">
+    <div class="mt-12 flex justify-center">
         {{ $products->links() }}
     </div>
 </div>
