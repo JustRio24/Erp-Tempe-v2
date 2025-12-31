@@ -14,6 +14,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'stock_warning_threshold' => env('STOCK_WARNING_THRESHOLD', 10),
+    'high_stock_threshold' => env('HIGH_STOCK_THRESHOLD', 100),
     'expiry_warning_days' => env('EXPIRY_WARNING_DAYS', 2),
     
     /*

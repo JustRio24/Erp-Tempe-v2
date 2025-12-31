@@ -60,6 +60,9 @@ class WeatherService
 
         foreach ($data['forecast']['forecastday'] as $day) {
             $tempC = $day['day']['avgtemp_c'];
+            $humidity = $day['day']['avghumidity'] ?? 50;
+            $precip = $day['day']['totalprecip_mm'] ?? 0;
+            $conditionCode = $day['day']['condition']['code'] ?? 1000;
             
             $forecast[] = [
                 'tanggal' => \Carbon\Carbon::parse($day['date'])->isoFormat('dddd, D MMMM Y'),
@@ -67,9 +70,11 @@ class WeatherService
                 'suhu_avg' => round($tempC),
                 'suhu_min' => round($day['day']['mintemp_c']),
                 'suhu_max' => round($day['day']['maxtemp_c']),
-                'klasifikasi' => $this->classifyTemperature($tempC),
+                'kelembaban' => $humidity,
+                'presipitasi' => $precip,
+                'klasifikasi' => $this->classifyWeather($tempC, $humidity, $precip, $conditionCode),
                 'kondisi' => $day['day']['condition']['text'] ?? 'Tidak ada data',
-                'icon' => $this->getIconClass($day['day']['condition']['code'] ?? 1000),
+                'icon' => $this->getIconClass($conditionCode),
             ];
         }
 
@@ -77,16 +82,24 @@ class WeatherService
     }
 
     /**
-     * Classify temperature as Panas/Normal/Dingin
+     * Classify weather based on temperature, humidity and rain
      */
-    protected function classifyTemperature($temp)
+    protected function classifyWeather($temp, $humidity, $precip, $conditionCode)
     {
-        if ($temp >= config('erp.weather_temp_hot', 30)) {
-            return 'Panas';
-        } elseif ($temp < config('erp.weather_temp_cold', 20)) {
-            return 'Dingin';
+        // 1. Dingin / Lembab: temp < 27 OR humidity high (> 80) OR rain forecast
+        // Rain condition codes: 1063, 1150-1201 (Light to moderate rain)
+        $isRainy = ($precip > 0.5) || ($conditionCode >= 1063 && $conditionCode <= 1276);
+
+        if ($temp < 27 || $humidity > 80 || $isRainy) {
+            return 'Dingin / Lembab';
         }
-        
+
+        // 2. Panas: temp > 32
+        if ($temp > 32) {
+            return 'Panas';
+        }
+
+        // 3. Normal: 27 - 32 AND no heavy rain
         return 'Normal';
     }
 
@@ -128,6 +141,8 @@ class WeatherService
                 'suhu_avg' => 28,
                 'suhu_min' => 24,
                 'suhu_max' => 32,
+                'kelembaban' => 60,
+                'presipitasi' => 0,
                 'klasifikasi' => 'Normal',
                 'kondisi' => 'Data cuaca tidak tersedia',
                 'icon' => '🌤️',
@@ -135,48 +150,5 @@ class WeatherService
         }
 
         return $forecast;
-    }
-
-    /**
-     * Get recommendations based on weather
-     */
-    public function getRecommendations()
-    {
-        $forecast = $this->getForecast();
-        $recommendations = [];
-
-        // Count hot/cold days in next 3 days
-        $next3Days = array_slice($forecast, 0, 3);
-        $hotDays = collect($next3Days)->where('klasifikasi', 'Panas')->count();
-        $coldDays = collect($next3Days)->where('klasifikasi', 'Dingin')->count();
-
-        if ($hotDays >= 2) {
-            $recommendations[] = [
-                'type' => 'warning',
-                'message' => 'Cuaca panas {$hotDays} hari ke depan. Proses fermentasi bisa lebih cepat, perhatikan kualitas tempe.',
-            ];
-            $recommendations[] = [
-                'type' => 'info',
-                'message' => 'Permintaan mungkin menurun saat cuaca panas. Pertimbangkan mengurangi produksi.',
-            ];
-        }
-
-        if ($coldDays >= 2) {
-            $recommendations[] = [
-                'type' => 'success',
-                'message' => 'Cuaca dingin {$coldDays} hari ke depan. Fermentasi lebih stabil dan permintaan biasanya meningkat.',
-            ];
-        }
-
-        // Check today's weather
-        $today = $forecast[0] ?? null;
-        if ($today && $today['klasifikasi'] === 'Panas') {
-            $recommendations[] = [
-                'type' => 'warning',
-                'message' => 'Cuaca hari ini panas. Pastikan tempat fermentasi tidak terlalu panas.',
-            ];
-        }
-
-        return $recommendations;
     }
 }

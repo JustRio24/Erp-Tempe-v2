@@ -45,29 +45,57 @@
 </div>
 @endif
 
-<!-- Weather Forecast -->
+<!-- Weather & Decision Support -->
 <div class="card">
-    <div class="card-header">
-        <h3>Prakiraan Cuaca 7 Hari</h3>
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3>🌦️ Prakiraan Cuaca & Rekomendasi</h3>
+        <span style="font-size: 0.875rem; color: #666;">Lokasi: {{ config('erp.weather_city', 'Jakarta') }}</span>
     </div>
-    <div class="grid grid-4" style="margin-bottom: 1.5rem;">
+
+    <!-- Weather Cards -->
+    <div class="grid grid-4" style="margin-bottom: 2rem;">
         @foreach(array_slice($forecast, 0, 7) as $day)
-            <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px;">
-                <div style="font-size: 2rem; margin-bottom: 0.5rem;">{{ $day['icon'] }}</div>
-                <div style="font-weight: 600; margin-bottom: 0.25rem;">{{ $day['tanggal_singkat'] }}</div>
-                <div style="font-size: 1.5rem; color: var(--primary); margin-bottom: 0.25rem;">{{ $day['suhu_avg'] }}°C</div>
-                <div style="font-size: 0.875rem; color: #666;">{{ $day['klasifikasi'] }}</div>
+            <div style="text-align: center; padding: 1rem; background: #f9fafb; border-radius: 8px; border: 1px solid #eee; position: relative;">
+                <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">{{ $day['icon'] }}</div>
+                <div style="font-weight: 600; font-size: 0.875rem; color: #444;">{{ $day['tanggal_singkat'] }}</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">{{ $day['suhu_avg'] }}°C</div>
+                
+                @php
+                    $badgeColor = match($day['klasifikasi']) {
+                        'Panas' => '#F44336',
+                        'Dingin / Lembab' => '#2196F3',
+                        'Normal' => '#4CAF50',
+                        default => '#9E9E9E'
+                    };
+                @endphp
+                <span style="font-size: 0.75rem; color: {{ $badgeColor }}; font-weight: 600; text-transform: uppercase;">
+                    {{ $day['klasifikasi'] }}
+                </span>
             </div>
         @endforeach
     </div>
 
-    @if(count($recommendations) > 0)
-        <h4 style="margin-bottom: 1rem;">Rekomendasi Produksi</h4>
-        @foreach($recommendations as $rec)
-            <div class="alert alert-{{ $rec['type'] }}" style="margin-bottom: 0.5rem;">
-                {{ $rec['message'] }}
+    <!-- Decision Support Notifications -->
+    @if(count($weatherRecommendations) > 0)
+        <div style="background: #fff8e1; border-radius: 12px; padding: 1.5rem; border-left: 5px solid #ffc107;">
+            <h4 style="margin-bottom: 1rem; color: #856404; display: flex; align-items: center; gap: 0.5rem;">
+                💡 Rekomendasi & Peringatan Cuaca
+            </h4>
+            <div class="grid grid-2" style="gap: 1rem;">
+                @foreach($weatherRecommendations as $rec)
+                    <div style="display: flex; gap: 0.75rem; padding: 0.75rem; background: rgba(255,255,255,0.7); border-radius: 8px; border: 1px solid rgba(0,0,0,0.05);">
+                        <div style="font-size: 1.25rem;">{{ $rec['icon'] ?? 'ℹ️' }}</div>
+                        <div style="font-size: 0.9375rem; line-height: 1.4; color: #444;">
+                            {{ $rec['message'] }}
+                        </div>
+                    </div>
+                @endforeach
             </div>
-        @endforeach
+        </div>
+    @else
+        <div style="text-align: center; padding: 1.5rem; background: #f1f8e9; border-radius: 12px; color: #388e3c;">
+            ✅ Cuaca stabil. Tidak ada peringatan khusus untuk produksi hari ini.
+        </div>
     @endif
 </div>
 
