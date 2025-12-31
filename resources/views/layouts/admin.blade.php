@@ -22,7 +22,10 @@
                     📊 Dashboard
                 </a>
                 <a href="{{ route('admin.products.index') }}" class="{{ request()->routeIs('admin.products.*') ? 'active' : '' }}">
-                    📦 Produk & Inventori
+                    📦 Produk Jadi
+                </a>
+                <a href="{{ route('admin.materials.index') }}" class="{{ request()->routeIs('admin.materials.*') ? 'active' : '' }}">
+                    🌾 Bahan Baku
                 </a>
                 <a href="{{ route('admin.production.index') }}" class="{{ request()->routeIs('admin.production.*') ? 'active' : '' }}">
                     🏭 Produksi

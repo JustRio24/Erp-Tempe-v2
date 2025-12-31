@@ -43,6 +43,11 @@ class Product extends Model
             ->withTimestamps();
     }
 
+    public function consumptions()
+    {
+        return $this->hasMany(MaterialConsumption::class);
+    }
+
     // Helper methods
     public function updateStock($jumlah)
     {

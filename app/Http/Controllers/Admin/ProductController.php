@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Models\Material;
+use App\Models\MaterialConsumption;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -123,5 +126,44 @@ class ProductController extends Controller
         ]);
 
         return back()->with('success', 'Stok berhasil disesuaikan');
+    }
+
+    public function bom(Product $product)
+    {
+        $materials = Material::all();
+        $product->load('consumptions.material');
+        return view('admin.products.bom', compact('product', 'materials'));
+    }
+
+    public function updateBom(Request $request, Product $product)
+    {
+        $request->validate([
+            'materials' => 'array',
+            'materials.*.id' => 'required|exists:materials,id',
+            'materials.*.jumlah_konsumsi' => 'required|numeric|min:0.0001',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Remove existing BOM
+            $product->consumptions()->delete();
+
+            // Add new BOM
+            if ($request->has('materials')) {
+                foreach ($request->materials as $matData) {
+                    MaterialConsumption::create([
+                        'product_id' => $product->id,
+                        'material_id' => $matData['id'],
+                        'jumlah_konsumsi' => $matData['jumlah_konsumsi'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+            return redirect()->route('admin.products.index')->with('success', 'Resep (BOM) berhasil diperbarui');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal memperbarui resep: ' . $e->getMessage());
+        }
     }
 }

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductionController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\FinanceController;
+use App\Http\Controllers\Admin\MaterialController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -55,6 +56,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('finance/laporan', [FinanceController::class, 'reports'])->name('finance.reports');
     Route::get('finance/laporan/pdf', [FinanceController::class, 'exportPdf'])->name('finance.reports.pdf');
     Route::post('finance/pengeluaran', [FinanceController::class, 'storeExpense'])->name('finance.store-expense');
+
+    // Material Management
+    Route::resource('materials', MaterialController::class);
+    Route::post('materials/{material}/restock', [MaterialController::class, 'restock'])->name('materials.restock');
+
+    // BOM Management (nested under products for clarity)
+    Route::get('products/{product}/bom', [ProductController::class, 'bom'])->name('products.bom');
+    Route::post('products/{product}/bom', [ProductController::class, 'updateBom'])->name('products.update-bom');
 });
 
 // Breeze default dashboard redirect

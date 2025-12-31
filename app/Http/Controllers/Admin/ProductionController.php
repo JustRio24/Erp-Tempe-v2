@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProductionBatch;
 use App\Models\Product;
+use App\Models\Material;
+use App\Models\MaterialMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -38,6 +40,34 @@ class ProductionController extends Controller
         DB::beginTransaction();
         
         try {
+            // 1. Calculate and validate total material requirements
+            $requirements = [];
+            foreach ($request->products as $productData) {
+                $product = Product::with('consumptions.material')->find($productData['id']);
+                $jumlahProduksi = $productData['jumlah'];
+
+                foreach ($product->consumptions as $bom) {
+                    $materialId = $bom->material_id;
+                    $need = $bom->jumlah_konsumsi * $jumlahProduksi;
+                    
+                    if (!isset($requirements[$materialId])) {
+                        $requirements[$materialId] = [
+                            'material' => $bom->material,
+                            'total_need' => 0
+                        ];
+                    }
+                    $requirements[$materialId]['total_need'] += $need;
+                }
+            }
+
+            // 2. Check if all materials are sufficient
+            foreach ($requirements as $req) {
+                if ($req['material']->stok_tersedia < $req['total_need']) {
+                    throw new \Exception("Stok tidak cukup: {$req['material']->nama} (Butuh: {$req['total_need']} {$req['material']->satuan}, Tersedia: {$req['material']->stok_tersedia} {$req['material']->satuan})");
+                }
+            }
+
+            // 3. Create Batch
             $batch = new ProductionBatch();
             $batch->tanggal_mulai = $request->tanggal_mulai;
             $batch->hari_ke = 1;
@@ -46,19 +76,28 @@ class ProductionController extends Controller
             $batch->catatan = $request->catatan;
             $batch->save();
 
+            // 4. Attach products and reduce materials
             foreach ($request->products as $productData) {
                 $batch->products()->attach($productData['id'], [
                     'jumlah' => $productData['jumlah']
                 ]);
             }
 
-            DB::commit();
+            foreach ($requirements as $materialId => $req) {
+                $req['material']->reduceStock(
+                    $req['total_need'],
+                    'produksi',
+                    $batch->id,
+                    "Kebutuhan produksi batch {$batch->kode_batch}"
+                );
+            }
 
-            return redirect()->route('admin.production.index')->with('success', 'Batch produksi berhasil dibuat');
+            DB::commit();
+            return redirect()->route('admin.production.index')->with('success', 'Batch produksi berhasil dibuat dan stok bahan baku dikurangi');
             
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Gagal membuat batch: ' . $e->getMessage())->withInput();
+            return back()->with('error', $e->getMessage())->withInput();
         }
     }
 

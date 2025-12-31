@@ -45,7 +45,10 @@
                         </span>
                     </td>
                     <td>
-                        <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-accent" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Edit</a>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{{ route('admin.products.bom', $product) }}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Atur Resep</a>
+                            <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-accent" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Edit</a>
+                        </div>
                     </td>
                 </tr>
             @empty
