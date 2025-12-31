@@ -14,7 +14,7 @@ class WeatherService
     public function __construct()
     {
         $this->apiKey = config('erp.weather_api_key');
-        $this->city = config('erp.weather_city', 'Jakarta');
+        $this->city = config('erp.weather_city', 'Palembang');
         $this->cacheHours = config('erp.weather_cache_hours', 3);
     }
 

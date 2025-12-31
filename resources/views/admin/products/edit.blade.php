@@ -102,18 +102,18 @@
         <div class="grid grid-3">
             <div class="form-group">
                 <label class="form-label">Tipe Penyesuaian</label>
-                <select name="type" class="form-control" required>
+                <select name="tipe" class="form-control" required>
                     <option value="masuk">Stok Masuk (+)</option>
                     <option value="keluar">Stok Keluar (-)</option>
                 </select>
             </div>
             <div class="form-group">
                 <label class="form-label">Jumlah</label>
-                <input type="number" name="amount" class="form-control" min="1" required>
+                <input type="number" name="jumlah" class="form-control" min="1" required>
             </div>
             <div class="form-group">
                 <label class="form-label">Keterangan</label>
-                <input type="text" name="notes" class="form-control" placeholder="Contoh: Koreksi stok, rusak, dll" required>
+                <input type="text" name="keterangan" class="form-control" placeholder="Contoh: Koreksi stok, rusak, dll" required>
             </div>
         </div>
         <button type="submit" class="btn btn-secondary">Update Stok</button>
