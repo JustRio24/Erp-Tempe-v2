@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FinancialRecord;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FinanceController extends Controller
 {
@@ -80,6 +81,43 @@ class FinanceController extends Controller
             'startDate',
             'endDate'
         ));
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $startDate = $request->input('start_date', now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->input('end_date', now()->endOfMonth()->format('Y-m-d'));
+
+        $income = FinancialRecord::pemasukan()
+            ->byDateRange($startDate, $endDate)
+            ->orderBy('tanggal')
+            ->get();
+        
+        $expenses = FinancialRecord::pengeluaran()
+            ->byDateRange($startDate, $endDate)
+            ->orderBy('tanggal')
+            ->get();
+
+        $totalIncome = $income->sum('jumlah');
+        $totalExpense = $expenses->sum('jumlah');
+        $profit = $totalIncome - $totalExpense;
+
+        $expensesByCategory = $expenses->groupBy('kategori')->map(function ($items) {
+            return $items->sum('jumlah');
+        });
+
+        $pdf = Pdf::loadView('admin.finance.pdf_report', compact(
+            'income',
+            'expenses',
+            'totalIncome',
+            'totalExpense',
+            'profit',
+            'expensesByCategory',
+            'startDate',
+            'endDate'
+        ));
+
+        return $pdf->download("Laporan_Keuangan_{$startDate}_{$endDate}.pdf");
     }
 
     public function storeExpense(Request $request)

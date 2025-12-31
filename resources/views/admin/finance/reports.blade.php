@@ -19,7 +19,12 @@
             <label class="form-label">Sampai Tanggal</label>
             <input type="date" name="end_date" class="form-control" value="{{ $endDate }}">
         </div>
-        <button type="submit" class="btn btn-primary" style="height: 46px;">Tampilkan Laporan</button>
+        <div style="display: flex; gap: 0.5rem; align-items: end;">
+            <button type="submit" class="btn btn-primary" style="height: 46px;">Tampilkan Laporan</button>
+            <a href="{{ route('admin.finance.reports.pdf', ['start_date' => $startDate, 'end_date' => $endDate]) }}" class="btn btn-secondary" style="height: 46px; display: flex; align-items: center; justify-content: center; text-decoration: none; padding: 0 1.5rem;">
+                📄 Cetak PDF
+            </a>
+        </div>
     </form>
 </div>
 

@@ -53,6 +53,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // Finance Management
     Route::get('finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::get('finance/laporan', [FinanceController::class, 'reports'])->name('finance.reports');
+    Route::get('finance/laporan/pdf', [FinanceController::class, 'exportPdf'])->name('finance.reports.pdf');
     Route::post('finance/pengeluaran', [FinanceController::class, 'storeExpense'])->name('finance.store-expense');
 });
 
