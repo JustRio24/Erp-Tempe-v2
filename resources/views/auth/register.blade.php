@@ -3,60 +3,86 @@
 @section('title', 'Daftar Akun')
 
 @section('content')
-<div class="container">
-    <div style="max-width: 500px; margin: 2rem auto;">
-        <div class="card" style="padding: 2.5rem; border-top: 5px solid var(--secondary);">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h2 style="color: var(--primary); margin-bottom: 0.5rem;">Buat Akun Baru</h2>
-                <p style="color: var(--text-light);">Bergabunglah dengan Tempe 3 Puteri</p>
+<div class="min-h-screen flex items-center justify-center bg-surface py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row-reverse">
+
+        <div class="hidden md:block md:w-1/2 relative bg-primary">
+            <img src="https://images.unsplash.com/photo-1515543904379-3d757afe72e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                alt="Kedelai Berkualitas"
+                class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay">
+            <div class="absolute inset-0 bg-gradient-to-t from-primary to-transparent opacity-90"></div>
+
+            <div class="absolute bottom-0 left-0 p-12 text-white">
+                <h2 class="text-3xl font-serif font-bold mb-2">Bergabung Bersama Kami</h2>
+                <p class="text-green-100 text-sm leading-relaxed">
+                    Dapatkan akses ke berbagai produk olahan kedelai terbaik langsung dari produsen terpercaya.
+                </p>
+            </div>
+        </div>
+
+        <div class="w-full md:w-1/2 p-8 md:p-12 relative">
+            <div class="text-center md:text-left mb-8">
+                <h1 class="text-2xl font-serif font-bold text-gray-900">Buat Akun Baru</h1>
+                <p class="text-gray-500 text-sm mt-1">Isi data diri Anda untuk mendaftar.</p>
             </div>
 
-            <!-- Validation Errors -->
             @if ($errors->any())
-                <div class="alert alert-error" style="margin-bottom: 1rem; font-size: 0.875rem;">
-                    <ul style="margin: 0; padding-left: 1rem;">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+            <div class="mb-6 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
             @endif
 
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="{{ route('register') }}" class="space-y-5">
                 @csrf
 
-                <!-- Name -->
-                <div class="form-group">
-                    <label for="name" class="form-label">Nama Lengkap</label>
-                    <input id="name" type="text" name="name" class="form-control" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="Nama Anda">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                    <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                        placeholder="Nama Lengkap Anda">
                 </div>
 
-                <!-- Email Address -->
-                <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
-                    <input id="email" type="email" name="email" class="form-control" value="{{ old('email') }}" required autocomplete="username" placeholder="nama@email.com">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Alamat Email</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                        placeholder="nama@email.com">
                 </div>
 
-                <!-- Password -->
-                <div class="form-group">
-                    <label for="password" class="form-label">Password</label>
-                    <input id="password" type="password" name="password" class="form-control" required autocomplete="new-password" placeholder="Minimal 8 karakter">
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input id="password" type="password" name="password" required autocomplete="new-password"
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                        placeholder="Minimal 8 karakter">
                 </div>
 
-                <!-- Confirm Password -->
-                <div class="form-group">
-                    <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                    <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" required autocomplete="new-password" placeholder="Ulangi password">
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Konfirmasi
+                        Password</label>
+                    <input id="password_confirmation" type="password" name="password_confirmation" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                        placeholder="Ulangi password">
                 </div>
 
-                <div style="margin-bottom: 1.5rem; margin-top: 2rem;">
-                    <button type="submit" class="btn btn-secondary" style="width: 100%; padding: 0.875rem; font-size: 1rem; font-weight: 600;">
-                        Daftar Akun
+                <div class="pt-2">
+                    <button type="submit"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg shadow-yellow-100 text-sm font-bold text-white bg-secondary hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-all transform hover:-translate-y-0.5">
+                        Daftar Sekarang
                     </button>
                 </div>
 
-                <div style="text-align: center; font-size: 0.875rem; color: var(--text-light);">
-                    Sudah punya akun? <a href="{{ route('login') }}" style="color: var(--primary); font-weight: 600;">Masuk di sini</a>
+                <div class="text-center mt-6">
+                    <p class="text-sm text-gray-600">
+                        Sudah punya akun?
+                        <a href="{{ route('login') }}"
+                            class="font-bold text-primary hover:text-green-800 transition-colors">
+                            Masuk di sini
+                        </a>
+                    </p>
                 </div>
             </form>
         </div>
