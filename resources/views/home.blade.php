@@ -40,7 +40,7 @@
         <div class="w-full md:w-1/2 relative">
             <div
                 class="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white aspect-video md:aspect-auto md:h-80 lg:h-96">
-                <img src="https://images.unsplash.com/photo-1626505776602-57b16c52bb88?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                <img src="{{ asset('storage/images/Tempe.jpg') }}"
                     alt="Tempe Premium"
                     class="w-full h-full object-cover transform hover:scale-105 transition duration-700">
             </div>
