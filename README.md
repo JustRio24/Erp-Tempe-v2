@@ -62,7 +62,7 @@ DB_USERNAME=root
 DB_PASSWORD=
 
 # Tambahkan API Key WeatherAPI (Opsional untuk fitur cuaca)
-# WEATHER_API_KEY=ad6b5989479b485286390913252502
+# WEATHER_API_KEY=your-api-key
 ```
 
 ### 4. Setup Database & Key
