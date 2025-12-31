@@ -42,9 +42,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     
     // Production Management
     Route::resource('production', ProductionController::class)->only(['index', 'create', 'store', 'show']);
-    Route::post('production/{productionBatch}/advance', [ProductionController::class, 'advanceDay'])->name('production.advance');
-    Route::post('production/{productionBatch}/complete', [ProductionController::class, 'complete'])->name('production.complete');
-    Route::post('production/{productionBatch}/record-failure', [ProductionController::class, 'recordFailure'])->name('production.record-failure');
+    Route::post('production/{production}/advance', [ProductionController::class, 'advanceDay'])->name('production.advance');
+    Route::post('production/{production}/complete', [ProductionController::class, 'complete'])->name('production.complete');
+    Route::post('production/{production}/record-failure', [ProductionController::class, 'recordFailure'])->name('production.record-failure');
     
     // Order Management
     Route::resource('orders', OrderController::class)->only(['index', 'show']);

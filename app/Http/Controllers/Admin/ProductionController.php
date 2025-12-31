@@ -38,13 +38,13 @@ class ProductionController extends Controller
         DB::beginTransaction();
         
         try {
-            $batch = ProductionBatch::create([
-                'tanggal_mulai' => $request->tanggal_mulai,
-                'hari_ke' => 1,
-                'status' => 'Hari ke-1',
-                'jumlah_target' => array_sum(array_column($request->products, 'jumlah')),
-                'catatan' => $request->catatan,
-            ]);
+            $batch = new ProductionBatch();
+            $batch->tanggal_mulai = $request->tanggal_mulai;
+            $batch->hari_ke = 1;
+            $batch->status = 'Hari ke-1';
+            $batch->jumlah_target = array_sum(array_column($request->products, 'jumlah'));
+            $batch->catatan = $request->catatan;
+            $batch->save();
 
             foreach ($request->products as $productData) {
                 $batch->products()->attach($productData['id'], [

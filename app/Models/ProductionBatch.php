@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 
 class ProductionBatch extends Model
 {
+    protected $table = 'production_batches';
+
     protected $fillable = [
         'kode_batch',
         'tanggal_mulai',
@@ -50,7 +52,8 @@ class ProductionBatch extends Model
 
     public function stockMovements()
     {
-        return $this->morphMany(StockMovement::class, 'referensi');
+        return $this->hasMany(StockMovement::class, 'referensi_id')
+            ->where('referensi_tipe', 'produksi');
     }
 
     // Helper methods
