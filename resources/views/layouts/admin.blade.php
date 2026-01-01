@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css'])
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="admin-body">
     <div class="admin-layout">
@@ -45,27 +46,63 @@
         <!-- Main Content -->
         <div class="admin-main">
             <div class="admin-content">
-                @if(session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                @if(session('error'))
-                    <div class="alert alert-error">{{ session('error') }}</div>
-                @endif
-                @if($errors->any())
-                    <div class="alert alert-error">
-                        <ul>
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
+                {{-- Modern Notifications will handle flash sessions --}}
                 @yield('content')
             </div>
         </div>
     </div>
 
     @vite(['resources/js/app.js'])
+    @stack('scripts')
+
+    <script>
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        // Handle Laravel Session Flashes
+        @if(session('success'))
+            Toast.fire({
+                icon: 'success',
+                title: '{{ session('success') }}'
+            });
+        @endif
+
+        @if(session('error'))
+            Toast.fire({
+                icon: 'error',
+                title: '{{ session('error') }}'
+            });
+        @endif
+
+        @if($errors->any())
+            Toast.fire({
+                icon: 'error',
+                title: '{!! $errors->first() !!}'
+            });
+        @endif
+
+        // Global Delete Confirmation
+        function confirmDelete(title = 'Apakah Anda yakin?', text = 'Data ini akan dihapus permanen!') {
+            return Swal.fire({
+                title: title,
+                text: text,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#1E88E5',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            });
+        }
+    </script>
 </body>
 </html>

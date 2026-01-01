@@ -53,10 +53,10 @@
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                     <button onclick="openRestockModal({{ $material->id }}, '{{ $material->nama }}', '{{ $material->satuan }}', '{{ $material->satuan_beli }}', {{ $material->harga_beli_terakhir }}, {{ $material->rasio_konversi }})" class="text-green-600 hover:text-green-900">Beli Bahan</button>
                     <a href="{{ route('admin.materials.edit', $material) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
-                    <form action="{{ route('admin.materials.destroy', $material) }}" method="POST" class="inline" onsubmit="return confirm('Hapus bahan ini?')">
+                    <form id="delete-form-{{ $material->id }}" action="{{ route('admin.materials.destroy', $material) }}" method="POST" class="inline">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:text-red-900">Hapus</button>
+                        <button type="button" @click="handleDelete('{{ $material->id }}', '{{ $material->nama }}')" class="text-red-600 hover:text-red-900">Hapus</button>
                     </form>
                 </td>
             </tr>
@@ -168,6 +168,17 @@
     function closeRestockModal() {
         document.getElementById('restockModal').classList.add('hidden');
         document.getElementById('restockForm').reset();
+    }
+
+    async function handleDelete(id, name) {
+        const result = await confirmDelete(
+            'Hapus Bahan Baku?',
+            `Apakah Anda yakin ingin menghapus ${name}? Data stok dan riwayat akan hilang.`
+        );
+
+        if (result.isConfirmed) {
+            document.getElementById(`delete-form-${id}`).submit();
+        }
     }
 </script>
 @endsection

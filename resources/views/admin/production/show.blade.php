@@ -65,9 +65,9 @@
 
                 <!-- Complete Batch -->
                 @if($production->hari_ke >= 3)
-                    <form action="{{ route('admin.production.complete', $production) }}" method="POST" style="flex: 1;" onsubmit="return confirm('Selesaikan batch? Stok produk akan bertambah otomatis.');">
+                    <form id="complete-batch-form" action="{{ route('admin.production.complete', $production) }}" method="POST" style="flex: 1;">
                         @csrf
-                        <button type="submit" class="btn btn-success" style="width: 100%;">
+                        <button type="button" onclick="handleComplete()" class="btn btn-success" style="width: 100%;">
                             ✅ Panen / Selesai
                         </button>
                     </form>
@@ -166,3 +166,24 @@
 @endif
 
 @endsection
+
+@push('scripts')
+<script>
+    async function handleComplete() {
+        const result = await Swal.fire({
+            title: 'Selesaikan Batch Produksi?',
+            text: "Stok produk akan bertambah otomatis berdasarkan hasil netto (Target - Gagal).",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4CAF50',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Panen Sekarang!',
+            cancelButtonText: 'Batal'
+        });
+
+        if (result.isConfirmed) {
+            document.getElementById('complete-batch-form').submit();
+        }
+    }
+</script>
+@endpush

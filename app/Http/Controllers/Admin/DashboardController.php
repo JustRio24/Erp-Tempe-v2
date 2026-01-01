@@ -171,7 +171,7 @@ class DashboardController extends Controller
                     $inventoryAlerts[] = [
                         'type' => 'warning',
                         'icon' => '🌾',
-                        'message' => "Stok Kedelai menipis. Cukup untuk " . round($daysLeft, 1) . " hari ke depan."
+                        'message' => "Stok Kedelai Cukup untuk " . round($daysLeft, 1) . " hari ke depan."
                     ];
                 }
             } elseif ($material->stok_tersedia <= $material->stok_minimal) {
@@ -246,6 +246,7 @@ class DashboardController extends Controller
             'monthlyGrossProfit',
             'monthlyNetProfit',
             'kedelaiTrend',
+            'kedelai',
             'forecast',
             'weatherRecommendations',
             'inventoryAlerts',

@@ -225,9 +225,9 @@
             $previous = count($kedelaiTrend) > 1 ? $kedelaiTrend[count($kedelaiTrend)-2] : null;
             $avgPrice = $kedelaiTrend->avg('harga_satuan');
         @endphp
-        @if($latest)
+        @if($latest && $kedelai)
             <div style="font-weight: 600; font-size: 0.9rem;">
-                Harga Sekarang: <span style="color: var(--primary);">Rp {{ number_format($latest->harga_satuan, 0, ',', '.') }}</span>
+                Harga Sekarang: <span style="color: var(--primary);">Rp {{ number_format($kedelai->harga_beli_terakhir, 0, ',', '.') }}</span>
             </div>
         @endif
     </div>
