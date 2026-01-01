@@ -49,7 +49,14 @@ class DashboardController extends Controller
         $monthlyExpense = FinancialRecord::pengeluaran()
             ->byMonth(date('Y'), date('m'))
             ->sum('jumlah');
-        $monthlyProfit = $monthlyIncome - $monthlyExpense;
+        
+        $monthlyCogs = Order::whereMonth('created_at', date('m'))
+            ->whereYear('created_at', date('Y'))
+            ->whereIn('status', ['selesai', 'diproses', 'dikirim'])
+            ->sum('hpp_total');
+            
+        $monthlyGrossProfit = $monthlyIncome - $monthlyCogs;
+        $monthlyNetProfit = $monthlyIncome - $monthlyExpense;
 
         // Weather & Decision Engine
         $forecast = $this->weatherService->getForecast();
@@ -146,6 +153,50 @@ class DashboardController extends Controller
             );
         }
 
+        // Inventory & Supply Chain Smart Alerts
+        $inventoryAlerts = [];
+        $materials = \App\Models\Material::all();
+        $dailyKedelaiUsage = 150; 
+
+        foreach ($materials as $material) {
+            if (str_contains(strtolower($material->nama), 'kedelai')) {
+                $daysLeft = $material->stok_tersedia / ($dailyKedelaiUsage ?: 1);
+                if ($daysLeft <= 3) {
+                    $inventoryAlerts[] = [
+                        'type' => 'danger',
+                        'icon' => '🌾',
+                        'message' => "Stok KEDELAI tinggal " . round($material->stok_tersedia) . "kg. Estimasi HABIS dalam " . round($daysLeft, 1) . " hari produksi!"
+                    ];
+                } elseif ($daysLeft <= 7) {
+                    $inventoryAlerts[] = [
+                        'type' => 'warning',
+                        'icon' => '🌾',
+                        'message' => "Stok Kedelai menipis. Cukup untuk " . round($daysLeft, 1) . " hari ke depan."
+                    ];
+                }
+            } elseif ($material->stok_tersedia <= $material->stok_minimal) {
+                $inventoryAlerts[] = [
+                    'type' => 'warning',
+                    'icon' => '📦',
+                    'message' => "Stok {$material->nama} di bawah batas minimal ({$material->stok_tersedia} {$material->satuan})."
+                ];
+            }
+        }
+
+        // Price Trend Analysis (Kedelai)
+        $kedelai = \App\Models\Material::where('nama', 'LIKE', '%Kedelai%')->first();
+        $kedelaiTrend = [];
+        if ($kedelai) {
+            $kedelaiTrend = \App\Models\MaterialMovement::where('material_id', $kedelai->id)
+                ->where('tipe', 'masuk')
+                ->whereNotNull('harga_satuan')
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get()
+                ->reverse()
+                ->values();
+        }
+
         // System Notifications
         $notifications = [];
         
@@ -191,9 +242,13 @@ class DashboardController extends Controller
             'todayRevenue',
             'monthlyIncome',
             'monthlyExpense',
-            'monthlyProfit',
+            'monthlyCogs',
+            'monthlyGrossProfit',
+            'monthlyNetProfit',
+            'kedelaiTrend',
             'forecast',
             'weatherRecommendations',
+            'inventoryAlerts',
             'notifications'
         ));
     }

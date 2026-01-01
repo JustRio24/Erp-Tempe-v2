@@ -27,6 +27,9 @@ class MaterialController extends Controller
             'nama' => 'required|string|max:255',
             'satuan' => 'required|string|max:50',
             'stok_minimal' => 'required|numeric|min:0',
+            'satuan_beli' => 'nullable|string|max:50',
+            'rasio_konversi' => 'required|numeric|min:0.01',
+            'harga_beli_terakhir' => 'required|numeric|min:0',
         ]);
 
         Material::create($request->all());
@@ -45,6 +48,9 @@ class MaterialController extends Controller
             'nama' => 'required|string|max:255',
             'satuan' => 'required|string|max:50',
             'stok_minimal' => 'required|numeric|min:0',
+            'satuan_beli' => 'nullable|string|max:50',
+            'rasio_konversi' => 'required|numeric|min:0.01',
+            'harga_beli_terakhir' => 'required|numeric|min:0',
         ]);
 
         $material->update($request->all());
@@ -64,31 +70,52 @@ class MaterialController extends Controller
             'jumlah' => 'required|numeric|min:0.01',
             'harga_total' => 'required|numeric|min:0',
             'keterangan' => 'nullable|string|max:255',
+            'use_bulk' => 'boolean', // Flag if user is buying in satuan_beli
         ]);
 
         DB::beginTransaction();
         try {
+            $jumlahInput = $request->jumlah;
+            $satuanTampil = $material->satuan;
+            
+            // Apply conversion if buying in bulk unit
+            if ($request->has('use_bulk') && $request->use_bulk) {
+                $jumlahStok = $jumlahInput * $material->rasio_konversi;
+                $satuanTampil = $material->satuan_beli;
+            } else {
+                $jumlahStok = $jumlahInput;
+            }
+
+            // Calculate unit price for COGS (based on pemakaian unit)
+            $hargaPerUnit = $request->harga_total / $jumlahStok;
+
             // 1. Add Stock & Movement
             $material->addStock(
-                $request->jumlah, 
+                $jumlahStok, 
                 'pembelian', 
                 null, 
-                $request->keterangan ?? "Pembelian {$request->jumlah} {$material->satuan} {$material->nama}"
+                $request->keterangan ?? "Pembelian {$jumlahInput} {$satuanTampil} {$material->nama}",
+                $hargaPerUnit
             );
 
-            // 2. Create Financial Record (Expense)
+            // 2. Update last purchase price
+            $material->update([
+                'harga_beli_terakhir' => $hargaPerUnit
+            ]);
+
+            // 3. Create Financial Record (Expense)
             FinancialRecord::create([
                 'tanggal' => now(),
                 'tipe' => 'pengeluaran',
                 'kategori' => 'Bahan Baku',
                 'jumlah' => $request->harga_total,
-                'deskripsi' => "Beli {$material->nama}: {$request->jumlah} {$material->satuan}. " . ($request->keterangan ?? ''),
+                'deskripsi' => "Beli {$material->nama}: {$jumlahInput} {$satuanTampil}. " . ($request->keterangan ?? ''),
                 'referensi_tipe' => 'pembelian_bahan',
                 'referensi_id' => $material->id,
             ]);
 
             DB::commit();
-            return back()->with('success', 'Stok berhasil ditambah dan pengeluaran tercatat');
+            return back()->with('success', 'Stok berhasil ditambah (Konversi: ' . number_format($jumlahStok, 2) . ' ' . $material->satuan . ') dan pengeluaran tercatat');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menambah stok: ' . $e->getMessage());

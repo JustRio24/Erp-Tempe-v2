@@ -75,4 +75,13 @@ class Product extends Model
         
         return $this->harga_normal;
     }
+
+    public function calculateHpp()
+    {
+        $totalCost = 0;
+        foreach ($this->consumptions as $bom) {
+            $totalCost += $bom->jumlah_konsumsi * ($bom->material->harga_beli_terakhir ?? 0);
+        }
+        return $totalCost;
+    }
 }

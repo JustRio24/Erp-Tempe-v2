@@ -13,10 +13,12 @@ class MaterialMovement extends Model
         'referensi_tipe',
         'referensi_id',
         'keterangan',
+        'harga_satuan',
     ];
 
     protected $casts = [
         'jumlah' => 'decimal:2',
+        'harga_satuan' => 'decimal:2',
     ];
 
     public function material()

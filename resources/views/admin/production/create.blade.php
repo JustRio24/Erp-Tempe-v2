@@ -34,6 +34,7 @@
                             <tr>
                                 <td style="text-align: center;">
                                     <input type="checkbox" name="products[{{ $loop->index }}][id]" value="{{ $product->id }}" 
+                                           data-hpp="{{ $product->calculateHpp() }}"
                                            style="width: 18px; height: 18px;" onchange="toggleInput(this, {{ $loop->index }})">
                                 </td>
                                 <td>
@@ -43,7 +44,7 @@
                                 <td>
                                     <div style="display: flex; align-items: center; gap: 0.5rem;">
                                         <input type="number" name="products[{{ $loop->index }}][jumlah]" class="form-control qty-input" 
-                                               min="1" disabled placeholder="0" style="width: 100px;">
+                                               min="1" disabled placeholder="0" style="width: 100px;" oninput="updateEstimation()">
                                         <span>{{ $product->satuan }}</span>
                                     </div>
                                 </td>
@@ -51,6 +52,20 @@
                         @endforeach
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="form-group" style="background: #f1f8e9; padding: 1.5rem; border-radius: 12px; margin-top: 1rem; border-left: 5px solid #4caf50;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h4 style="margin: 0; color: #2e7d32; display: flex; align-items: center; gap: 0.5rem;">
+                        💰 Estimasi Biaya Bahan Baku
+                    </h4>
+                    <p style="margin: 0.25rem 0 0 0; font-size: 0.875rem; color: #666;">Berdasarkan BOM dan Harga Beli Terakhir</p>
+                </div>
+                <div style="text-align: right;">
+                    <div id="totalCost" style="font-size: 1.5rem; font-weight: 800; color: #1b5e20;">Rp 0</div>
+                </div>
             </div>
         </div>
 
@@ -78,6 +93,25 @@ function toggleInput(checkbox, index) {
             input.required = false;
         }
     });
+    updateEstimation();
+}
+
+function updateEstimation() {
+    let total = 0;
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        const qtyInput = row.querySelector('.qty-input');
+        
+        if (checkbox && checkbox.checked) {
+            const hpp = parseFloat(checkbox.dataset.hpp) || 0;
+            const qty = parseFloat(qtyInput.value) || 0;
+            total += hpp * qty;
+        }
+    });
+    
+    document.getElementById('totalCost').innerText = 'Rp ' + total.toLocaleString('id-ID');
 }
 </script>
 @endsection

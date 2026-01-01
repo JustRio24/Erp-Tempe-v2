@@ -107,7 +107,8 @@
             <tr>
                 <th>Produk</th>
                 <th>Target Produksi</th>
-                <th>Hasil Jadi</th>
+                <th style="color: var(--danger);">Gagal (Busuk/Rusak)</th>
+                <th>Hasil Netto (Stok)</th>
             </tr>
         </thead>
         <tbody>
@@ -115,13 +116,16 @@
                 <tr>
                     <td>{{ $item->nama }}</td>
                     <td>{{ $item->pivot->jumlah }} {{ $item->satuan }}</td>
+                    <td style="color: var(--danger);">{{ $item->pivot->jumlah_gagal ?? 0 }} {{ $item->satuan }}</td>
                     <td>
                         @if($production->status === 'Selesai')
+                            @php $netto = max(0, $item->pivot->jumlah - ($item->pivot->jumlah_gagal ?? 0)); @endphp
                             <span style="color: var(--success); font-weight: bold;">
-                                {{ $item->pivot->jumlah }} {{ $item->satuan }}
+                                {{ $netto }} {{ $item->satuan }}
                             </span>
                         @else
-                            <span style="color: #999;">Dalam Proses</span>
+                            @php $est = max(0, $item->pivot->jumlah - ($item->pivot->jumlah_gagal ?? 0)); @endphp
+                            <span style="color: #666;">Estimasi: {{ $est }} {{ $item->satuan }}</span>
                         @endif
                     </td>
                 </tr>

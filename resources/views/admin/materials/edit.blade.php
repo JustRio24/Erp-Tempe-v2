@@ -16,6 +16,11 @@
             <label class="form-label">Nama Bahan Baku</label>
             <input type="text" name="nama" class="form-control" value="{{ $material->nama }}" required>
         </div>
+
+        <div class="mb-4">
+            <label class="form-label">Harga Beli Terakhir (Rp per Satuan Kecil)</label>
+            <input type="number" step="1" name="harga_beli_terakhir" class="form-control" value="{{ round($material->harga_beli_terakhir) }}" required>
+        </div>
         
         <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
@@ -31,6 +36,17 @@
             <div>
                 <label class="form-label">Stok Minimal</label>
                 <input type="number" step="0.01" name="stok_minimal" class="form-control" value="{{ $material->stok_minimal }}" required>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <label class="form-label">Satuan Beli Besar (Opsional)</label>
+                <input type="text" name="satuan_beli" class="form-control" value="{{ $material->satuan_beli }}" placeholder="Misal: Karung">
+            </div>
+            <div>
+                <label class="form-label">Isi per Satuan Beli</label>
+                <input type="number" step="0.01" name="rasio_konversi" class="form-control" value="{{ $material->rasio_konversi ?? 1 }}">
             </div>
         </div>
 

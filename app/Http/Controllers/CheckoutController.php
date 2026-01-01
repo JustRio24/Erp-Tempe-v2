@@ -88,8 +88,9 @@ class CheckoutController extends Controller
 
             // Create Items
             $subtotalOrder = 0;
+            $hppOrder = 0;
             foreach ($cart as $productId => $quantity) {
-                $product = Product::find($productId);
+                $product = Product::with('consumptions.material')->find($productId);
                 if ($product->stok_tersedia < $quantity) {
                     throw new \Exception("Stok {$product->nama} habis");
                 }
@@ -97,6 +98,7 @@ class CheckoutController extends Controller
                 $harga = $product->getHargaByJumlah($quantity);
                 $lineTotal = $harga * $quantity;
                 $subtotalOrder += $lineTotal;
+                $hppOrder += $product->calculateHpp() * $quantity;
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -109,6 +111,7 @@ class CheckoutController extends Controller
             }
 
             $order->subtotal = $subtotalOrder;
+            $order->hpp_total = $hppOrder;
             $order->total = $subtotalOrder + $ongkir;
             $order->save();
             $order->reduceStock();

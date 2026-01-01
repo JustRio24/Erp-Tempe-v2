@@ -15,6 +15,12 @@
             <label class="form-label">Nama Bahan Baku</label>
             <input type="text" name="nama" class="form-control" placeholder="Contoh: Kedelai Impor" required>
         </div>
+
+        <div class="mb-4">
+            <label class="form-label">Harga Beli Terakhir (Rp per Satuan Kecil)</label>
+            <input type="number" step="1" name="harga_beli_terakhir" class="form-control" placeholder="Contoh: 9800" required>
+            <p class="text-[10px] text-gray-400 mt-1">Harga ini akan menjadi acuan modal (HPP) produk.</p>
+        </div>
         
         <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
@@ -31,6 +37,18 @@
                 <label class="form-label">Stok Minimal</label>
                 <input type="number" step="0.01" name="stok_minimal" class="form-control" value="0" required>
                 <p class="text-xs text-gray-500 mt-1">Peringatan jika stok di bawah angka ini.</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div>
+                <label class="form-label">Satuan Beli Besar (Opsional)</label>
+                <input type="text" name="satuan_beli" class="form-control" placeholder="Misal: Karung">
+            </div>
+            <div>
+                <label class="form-label">Isi per Satuan Beli</label>
+                <input type="number" step="0.01" name="rasio_konversi" class="form-control" value="1">
+                <p class="text-[10px] text-gray-400 mt-1">Contoh: 1 Karung = 50kg. Isi 50.</p>
             </div>
         </div>
 

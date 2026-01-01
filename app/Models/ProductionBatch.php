@@ -46,7 +46,7 @@ class ProductionBatch extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class, 'batch_products')
-            ->withPivot('jumlah')
+            ->withPivot('jumlah', 'jumlah_gagal')
             ->withTimestamps();
     }
 
@@ -74,23 +74,32 @@ class ProductionBatch extends Model
         
         // Update stock for each product in the batch
         foreach ($this->products as $product) {
-            $jumlah = $product->pivot->jumlah;
-            $product->increment('stok_tersedia', $jumlah);
+            $gagal = $product->pivot->jumlah_gagal ?? 0;
+            $jumlahJadi = max(0, $product->pivot->jumlah - $gagal);
             
-            // Record stock movement
-            StockMovement::create([
-                'product_id' => $product->id,
-                'tipe' => 'masuk',
-                'jumlah' => $jumlah,
-                'referensi_tipe' => 'produksi',
-                'referensi_id' => $this->id,
-                'keterangan' => 'Hasil produksi batch ' . $this->kode_batch,
-            ]);
+            if ($jumlahJadi > 0) {
+                $product->increment('stok_tersedia', $jumlahJadi);
+                
+                // Record stock movement
+                StockMovement::create([
+                    'product_id' => $product->id,
+                    'tipe' => 'masuk',
+                    'jumlah' => $jumlahJadi,
+                    'referensi_tipe' => 'produksi',
+                    'referensi_id' => $this->id,
+                    'keterangan' => "Hasil produksi batch {$this->kode_batch} (Target: {$product->pivot->jumlah}, Gagal: {$gagal})",
+                ]);
+            }
         }
     }
 
     public function recordFailure($product_id, $jumlah)
     {
         $this->increment('jumlah_gagal', $jumlah);
+        
+        // Update pivot table (Satuan gagal per produk)
+        $this->products()->updateExistingPivot($product_id, [
+            'jumlah_gagal' => \Illuminate\Support\Facades\DB::raw("jumlah_gagal + $jumlah")
+        ]);
     }
 }

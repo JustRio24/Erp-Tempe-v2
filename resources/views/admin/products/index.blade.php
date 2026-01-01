@@ -17,7 +17,9 @@
             <tr>
                 <th>Nama Produk</th>
                 <th>Satuan</th>
-                <th>Harga</th>
+                <th>Harga Jual</th>
+                <th>HPP (Modal)</th>
+                <th>Margin (%)</th>
                 <th>Stok</th>
                 <th>Status Stok</th>
                 <th>Aksi</th>
@@ -34,6 +36,19 @@
                     </td>
                     <td>{{ $product->satuan }}</td>
                     <td>Rp {{ number_format($product->harga_normal, 0, ',', '.') }}</td>
+                    <td style="color: #666;">
+                        @php $hpp = $product->calculateHpp(); @endphp
+                        Rp {{ number_format($hpp, 2, ',', '.') }}
+                    </td>
+                    <td>
+                        @php 
+                            $marginVal = $product->harga_normal > 0 ? (($product->harga_normal - $hpp) / $product->harga_normal) * 100 : 0;
+                            $marginColor = $marginVal < 20 ? '#F44336' : ($marginVal < 40 ? '#FF9800' : '#4CAF50');
+                        @endphp
+                        <span style="font-weight: bold; color: {{ $marginColor }};">
+                            {{ number_format($marginVal, 1) }}%
+                        </span>
+                    </td>
                     <td>{{ $product->stok_tersedia }} {{ $product->satuan }}</td>
                     <td>
                         @php

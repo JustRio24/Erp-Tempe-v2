@@ -7,6 +7,7 @@ use App\Models\ProductionBatch;
 use App\Models\Product;
 use App\Models\Material;
 use App\Models\MaterialMovement;
+use App\Services\WeatherService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -23,7 +24,9 @@ class ProductionController extends Controller
 
     public function create()
     {
-        $products = Product::where('is_active', true)->get();
+        $products = Product::where('is_active', true)
+            ->with('consumptions.material')
+            ->get();
         return view('admin.production.create', compact('products'));
     }
 
@@ -40,6 +43,22 @@ class ProductionController extends Controller
         DB::beginTransaction();
         
         try {
+            // 0. Get Weather Adjustment for Yeast (Ragi)
+            $weatherService = new WeatherService();
+            $forecast = $weatherService->getForecast();
+            $todayWeather = $forecast[0]['klasifikasi'] ?? 'Normal';
+            
+            $ragiMultiplier = 1.0;
+            $weatherNote = "";
+
+            if ($todayWeather === 'Panas') {
+                $ragiMultiplier = 0.90; // -10%
+                $weatherNote = " (Takaran ragi dikurangi 10% karena cuaca Panas)";
+            } elseif ($todayWeather === 'Dingin / Lembab') {
+                $ragiMultiplier = 1.15; // +15%
+                $weatherNote = " (Takaran ragi ditambah 15% karena cuaca Dingin/Lembab)";
+            }
+
             // 1. Calculate and validate total material requirements
             $requirements = [];
             foreach ($request->products as $productData) {
@@ -48,7 +67,14 @@ class ProductionController extends Controller
 
                 foreach ($product->consumptions as $bom) {
                     $materialId = $bom->material_id;
-                    $need = $bom->jumlah_konsumsi * $jumlahProduksi;
+                    $isRagi = str_contains(strtolower($bom->material->nama), 'ragi');
+                    
+                    $unitNeed = $bom->jumlah_konsumsi;
+                    if ($isRagi) {
+                        $unitNeed *= $ragiMultiplier;
+                    }
+
+                    $need = $unitNeed * $jumlahProduksi;
                     
                     if (!isset($requirements[$materialId])) {
                         $requirements[$materialId] = [
@@ -93,7 +119,7 @@ class ProductionController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('admin.production.index')->with('success', 'Batch produksi berhasil dibuat dan stok bahan baku dikurangi');
+            return redirect()->route('admin.production.index')->with('success', 'Batch produksi berhasil dibuat dan stok bahan baku dikurangi' . $weatherNote);
             
         } catch (\Exception $e) {
             DB::rollBack();
