@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Midtrans\Snap;
+use Midtrans\Config;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\OrderItem;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Midtrans\Config;
-use Midtrans\Snap;
 
 class CheckoutController extends Controller
 {
@@ -82,6 +83,7 @@ class CheckoutController extends Controller
                 'ongkir' => $ongkir,
                 'status' => 'pending',
                 'catatan' => $request->catatan,
+                'nomor_pesanan' => 'ORD-' . Str::upper(Str::random(10)), // Hasil: ORD-X7K9M2L1P0
             ]);
 
             // Create Items
