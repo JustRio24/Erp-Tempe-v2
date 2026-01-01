@@ -28,7 +28,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span
                                     class="text-red-500">*</span></label>
                             <input type="text" name="nama_pembeli"
-                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors"
+                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
                                 value="{{ old('nama_pembeli') }}" placeholder="Contoh: Budi Santoso" required>
                         </div>
 
@@ -36,7 +36,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon (WhatsApp) <span
                                     class="text-red-500">*</span></label>
                             <input type="tel" name="telepon_pembeli"
-                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors"
+                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
                                 value="{{ old('telepon_pembeli') }}" placeholder="0812..." required>
                         </div>
 
@@ -44,7 +44,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Email <span
                                     class="text-red-500">*</span></label>
                             <input type="email" name="email_pembeli"
-                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors"
+                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
                                 value="{{ old('email_pembeli') }}" placeholder="email@contoh.com" required>
                         </div>
 
@@ -52,7 +52,7 @@
                             <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap <span
                                     class="text-red-500">*</span></label>
                             <textarea name="alamat_pembeli" rows="3"
-                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors"
+                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
                                 placeholder="Nama Jalan, RT/RW, Kelurahan, Kecamatan..."
                                 required>{{ old('alamat_pembeli') }}</textarea>
                         </div>
@@ -160,7 +160,7 @@
                 <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Catatan Pesanan (Opsional)</label>
                     <textarea name="catatan"
-                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors"
+                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
                         rows="2"
                         placeholder="Contoh: Tolong pilihkan tempe yang benar-benar matang.">{{ old('catatan') }}</textarea>
                 </div>
