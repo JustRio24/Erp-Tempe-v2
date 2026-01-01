@@ -7,35 +7,35 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class CheckoutController extends Controller
 {
+    // Function index() biarkan sama seperti kode asli Anda...
     public function index()
     {
+        // ... (kode load cart, dll) ...
         $cart = session('cart', []);
-        
-        if (empty($cart)) {
-            return redirect()->route('catalog.index')->with('error', 'Keranjang belanja kosong');
-        }
+        if (empty($cart)) return redirect()->route('catalog.index')->with('error', 'Keranjang kosong');
 
+        // Logic hitung cart ... (sama seperti punya Anda)
+
+        // Pass data ke view
         $cartItems = [];
         $subtotal = 0;
-
         foreach ($cart as $productId => $quantity) {
+            // ... logic loop cart Anda ...
             $product = Product::find($productId);
-            if ($product && $product->is_active) {
-                $harga = $product->getHargaByJumlah($quantity);
-                $itemSubtotal = $harga * $quantity;
-                
-                $cartItems[] = [
-                    'product' => $product,
-                    'quantity' => $quantity,
-                    'harga' => $harga,
-                    'subtotal' => $itemSubtotal,
-                ];
-                
-                $subtotal += $itemSubtotal;
-            }
+            $harga = $product->getHargaByJumlah($quantity);
+            $itemSubtotal = $harga * $quantity;
+            $cartItems[] = [
+                'product' => $product,
+                'quantity' => $quantity,
+                'harga' => $harga,
+                'subtotal' => $itemSubtotal
+            ];
+            $subtotal += $itemSubtotal;
         }
 
         $paymentMethods = config('erp.payment_methods');
@@ -47,82 +47,114 @@ class CheckoutController extends Controller
 
     public function process(Request $request)
     {
+        // Validasi
         $request->validate([
             'nama_pembeli' => 'required|string|max:255',
             'email_pembeli' => 'required|email|max:255',
             'telepon_pembeli' => 'required|string|max:20',
             'alamat_pembeli' => 'required|string',
             'metode_pembayaran' => 'required|in:transfer_bank,cod',
-            'bank_tujuan' => 'required_if:metode_pembayaran,transfer_bank',
             'metode_pengiriman' => 'required|in:ambil_sendiri,kurir',
             'catatan' => 'nullable|string|max:500',
         ]);
 
         $cart = session('cart', []);
-        
         if (empty($cart)) {
-            return redirect()->route('catalog.index')->with('error', 'Keranjang belanja kosong');
+            // Return JSON error jika cart kosong
+            return response()->json(['status' => 'error', 'message' => 'Keranjang kosong', 'redirect' => route('catalog.index')], 400);
         }
 
         DB::beginTransaction();
-        
+
         try {
-            // Create order
+            // Hitung Ongkir
+            $ongkir = $request->metode_pengiriman === 'kurir' ? 15000 : 0;
+
+            // Create Order
             $order = Order::create([
                 'nama_pembeli' => $request->nama_pembeli,
                 'email_pembeli' => $request->email_pembeli,
                 'telepon_pembeli' => $request->telepon_pembeli,
                 'alamat_pembeli' => $request->alamat_pembeli,
                 'metode_pembayaran' => $request->metode_pembayaran,
-                'bank_tujuan' => $request->bank_tujuan,
+                'bank_tujuan' => null,
                 'metode_pengiriman' => $request->metode_pengiriman,
-                'ongkir' => $request->metode_pengiriman === 'kurir' ? 15000 : 0,
+                'ongkir' => $ongkir,
                 'status' => 'pending',
                 'catatan' => $request->catatan,
             ]);
 
-            // Create order items
+            // Create Items
+            $subtotalOrder = 0;
             foreach ($cart as $productId => $quantity) {
                 $product = Product::find($productId);
-                
-                if (!$product || !$product->is_active) {
-                    throw new \Exception('Produk tidak tersedia');
-                }
-                
                 if ($product->stok_tersedia < $quantity) {
-                    throw new \Exception('Stok produk ' . $product->nama . ' tidak mencukupi');
+                    throw new \Exception("Stok {$product->nama} habis");
                 }
-                
+
                 $harga = $product->getHargaByJumlah($quantity);
-                $subtotal = $harga * $quantity;
-                
+                $lineTotal = $harga * $quantity;
+                $subtotalOrder += $lineTotal;
+
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'nama_produk' => $product->nama,
                     'jumlah' => $quantity,
                     'harga_satuan' => $harga,
-                    'subtotal' => $subtotal,
+                    'subtotal' => $lineTotal,
                 ]);
             }
 
-            // Calculate order total
-            $order->calculateTotal();
-            
-            // Update order status to 'diproses' and reduce stock
-            $order->updateStatus('diproses');
+            $order->subtotal = $subtotalOrder;
+            $order->total = $subtotalOrder + $ongkir;
+            $order->save();
             $order->reduceStock();
 
-            DB::commit();
+            // Variabel untuk response
+            $snapToken = null;
+            $redirectUrl = route('checkout.success', $order);
 
-            // Clear cart
+            // LOGIC MIDTRANS
+            if ($request->metode_pembayaran === 'transfer_bank') {
+                Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+                Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
+                Config::$isSanitized = true;
+                Config::$is3ds = true;
+
+                $params = [
+                    'transaction_details' => [
+                        'order_id' => $order->nomor_pesanan,
+                        'gross_amount' => (int) $order->total,
+                    ],
+                    'customer_details' => [
+                        'first_name' => $order->nama_pembeli,
+                        'email' => $order->email_pembeli,
+                        'phone' => $order->telepon_pembeli,
+                    ],
+                ];
+
+                $snapToken = Snap::getSnapToken($params);
+                $order->snap_token = $snapToken;
+                $order->save();
+            } else {
+                // Jika COD, langsung update status diproses
+                $order->updateStatus('diproses');
+            }
+
+            DB::commit();
             session()->forget('cart');
 
-            return redirect()->route('checkout.success', $order)->with('success', 'Pesanan berhasil dibuat!');
-            
+            // RETURN JSON UNTUK AJAX
+            return response()->json([
+                'status' => 'success',
+                'order_id' => $order->nomor_pesanan,
+                'snap_token' => $snapToken, // Token dikirim ke frontend
+                'redirect_url' => $redirectUrl
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->withInput();
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
 

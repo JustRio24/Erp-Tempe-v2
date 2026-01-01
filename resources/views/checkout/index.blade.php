@@ -10,79 +10,63 @@
         <p class="text-gray-500 text-sm mt-1">Lengkapi data diri Anda untuk menyelesaikan pesanan.</p>
     </div>
 
+    {{-- ID FORM SANGAT PENTING: id="checkout-form" --}}
     <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form">
         @csrf
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
 
             <div class="lg:col-span-7 space-y-8">
 
+                {{-- 1. DATA PEMBELI --}}
                 <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        <span
-                            class="w-8 h-8 rounded-full bg-green-100 text-primary flex items-center justify-center text-sm">1</span>
+                        <span class="w-8 h-8 rounded-full bg-green-100 text-primary flex items-center justify-center text-sm">1</span>
                         Data Pembeli
                     </h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="col-span-2 md:col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span
-                                    class="text-red-500">*</span></label>
-                            <input type="text" name="nama_pembeli"
-                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
-                                value="{{ old('nama_pembeli') }}" placeholder="Contoh: Budi Santoso" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
+                            <input type="text" name="nama_pembeli" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" value="{{ old('nama_pembeli') }}" placeholder="Contoh: Budi Santoso" required>
                         </div>
 
                         <div class="col-span-2 md:col-span-1">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon (WhatsApp) <span
-                                    class="text-red-500">*</span></label>
-                            <input type="tel" name="telepon_pembeli"
-                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
-                                value="{{ old('telepon_pembeli') }}" placeholder="0812..." required>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon (WhatsApp) <span class="text-red-500">*</span></label>
+                            <input type="tel" name="telepon_pembeli" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" value="{{ old('telepon_pembeli') }}" placeholder="0812..." required>
                         </div>
 
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email <span
-                                    class="text-red-500">*</span></label>
-                            <input type="email" name="email_pembeli"
-                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
-                                value="{{ old('email_pembeli') }}" placeholder="email@contoh.com" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
+                            <input type="email" name="email_pembeli" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" value="{{ old('email_pembeli') }}" placeholder="email@contoh.com" required>
                         </div>
 
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap <span
-                                    class="text-red-500">*</span></label>
-                            <textarea name="alamat_pembeli" rows="3"
-                                class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
-                                placeholder="Nama Jalan, RT/RW, Kelurahan, Kecamatan..."
-                                required>{{ old('alamat_pembeli') }}</textarea>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap <span class="text-red-500">*</span></label>
+                            <textarea name="alamat_pembeli" rows="3" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" placeholder="Nama Jalan, RT/RW, Kelurahan, Kecamatan..." required>{{ old('alamat_pembeli') }}</textarea>
                         </div>
                     </div>
                 </div>
 
+                {{-- 2. METODE PENGIRIMAN --}}
                 <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        <span
-                            class="w-8 h-8 rounded-full bg-green-100 text-primary flex items-center justify-center text-sm">2</span>
+                        <span class="w-8 h-8 rounded-full bg-green-100 text-primary flex items-center justify-center text-sm">2</span>
                         Metode Pengiriman
                     </h3>
 
                     <div class="space-y-3">
-                        @foreach($shippingMethods as $key => $method)
-                        <label
-                            class="relative flex items-center p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors group has-[:checked]:border-primary has-[:checked]:bg-green-50">
-                            <input type="radio" name="metode_pengiriman" value="{{ $key }}"
-                                class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" {{
-                                old('metode_pengiriman', 'ambil_sendiri' )===$key ? 'checked' : '' }} required>
+                        @foreach ($shippingMethods as $key => $method)
+                        <label class="relative flex items-center p-4 border rounded-xl cursor-pointer hover:bg-gray-50 transition-colors group has-[:checked]:border-primary has-[:checked]:bg-green-50">
+                            <input type="radio" name="metode_pengiriman" value="{{ $key }}" class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" {{ old('metode_pengiriman', 'ambil_sendiri') === $key ? 'checked' : '' }} required>
                             <div class="ml-3 flex-1">
                                 <span class="block text-sm font-bold text-gray-900">{{ $method }}</span>
-                                @if($key === 'kurir')
+                                @if ($key === 'kurir')
                                 <span class="block text-xs text-gray-500 mt-1">Estimasi pengiriman 1-2 hari kerja</span>
                                 @else
-                                <span class="block text-xs text-gray-500 mt-1">Ambil langsung di lokasi produksi
-                                    kami</span>
+                                <span class="block text-xs text-gray-500 mt-1">Ambil langsung di lokasi produksi kami</span>
                                 @endif
                             </div>
-                            @if($key === 'kurir')
+                            @if ($key === 'kurir')
                             <span class="text-sm font-bold text-gray-900">+ Rp 15.000</span>
                             @else
                             <span class="text-sm font-bold text-green-600">Gratis</span>
@@ -92,101 +76,62 @@
                     </div>
                 </div>
 
+                {{-- 3. METODE PEMBAYARAN --}}
                 <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        <span
-                            class="w-8 h-8 rounded-full bg-green-100 text-primary flex items-center justify-center text-sm">3</span>
+                        <span class="w-8 h-8 rounded-full bg-green-100 text-primary flex items-center justify-center text-sm">3</span>
                         Metode Pembayaran
                     </h3>
 
                     <div class="space-y-4">
-                        <div
-                            class="border rounded-xl p-4 has-[:checked]:border-primary has-[:checked]:bg-green-50 transition-colors">
-                            <label class="flex items-center cursor-pointer mb-2">
-                                <input type="radio" name="metode_pembayaran" value="transfer_bank"
-                                    class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" {{
-                                    old('metode_pembayaran', 'transfer_bank' )==='transfer_bank' ? 'checked' : '' }}
-                                    onchange="toggleBankSelect(true)">
-                                <span class="ml-3 font-bold text-gray-900">Transfer Bank</span>
-                            </label>
-
-                            <div id="bank-selection-container" class="ml-7 mt-2 relative">
-                                <input type="hidden" name="bank_tujuan" id="bank_tujuan_input"
-                                    value="{{ old('bank_tujuan') }}">
-
-                                <button type="button" id="custom-dropdown-trigger" onclick="toggleCustomDropdown()"
-                                    class="w-full bg-white border border-gray-300 rounded-lg py-2.5 px-4 text-left flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all">
-                                    <span id="selected-bank-text"
-                                        class="text-sm {{ old('bank_tujuan') ? 'text-gray-900 font-medium' : 'text-gray-500' }}">
-                                        @if(old('bank_tujuan') && isset($banks[old('bank_tujuan')]))
-                                        {{ $banks[old('bank_tujuan')] }}
-                                        @else
-                                        -- Pilih Bank Tujuan --
-                                        @endif
-                                    </span>
-                                    <svg id="dropdown-arrow"
-                                        class="w-4 h-4 text-gray-400 transition-transform duration-200" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 9l-7 7-7-7"></path>
-                                    </svg>
-                                </button>
-
-                                <div id="custom-dropdown-options"
-                                    class="hidden absolute z-20 w-full mt-1 bg-white border border-green-200 rounded-xl shadow-lg max-h-60 overflow-y-auto custom-scrollbar">
-                                    @foreach($banks as $key => $bank)
-                                    <div onclick="selectBank('{{ $key }}', '{{ $bank }}')"
-                                        class="px-4 py-3 text-sm cursor-pointer transition-colors border-b border-gray-50 last:border-0 hover:bg-green-50 hover:text-primary {{ old('bank_tujuan') === $key ? 'bg-green-50 text-primary font-bold' : 'text-gray-700' }}">
-                                        {{ $bank }}
-                                    </div>
-                                    @endforeach
+                        {{-- E-Payment (Midtrans) --}}
+                        <div class="border rounded-xl p-4 has-[:checked]:border-primary has-[:checked]:bg-green-50 transition-colors">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="metode_pembayaran" value="transfer_bank" class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" {{ old('metode_pembayaran', 'transfer_bank') === 'transfer_bank' ? 'checked' : '' }}>
+                                <div class="ml-3">
+                                    <span class="block font-bold text-gray-900">E-Payment (Otomatis)</span>
+                                    <span class="block text-xs text-gray-500 mt-0.5">QRIS, GoPay, ShopeePay, Transfer Bank (VA)</span>
                                 </div>
-                            </div>
+                            </label>
                         </div>
 
-                        <div
-                            class="border rounded-xl p-4 has-[:checked]:border-primary has-[:checked]:bg-green-50 transition-colors">
+                        {{-- COD --}}
+                        <div class="border rounded-xl p-4 has-[:checked]:border-primary has-[:checked]:bg-green-50 transition-colors">
                             <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="metode_pembayaran" value="cod"
-                                    class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" {{
-                                    old('metode_pembayaran')==='cod' ? 'checked' : '' }}
-                                    onchange="toggleBankSelect(false)">
+                                <input type="radio" name="metode_pembayaran" value="cod" class="h-4 w-4 text-primary border-gray-300 focus:ring-primary" {{ old('metode_pembayaran') === 'cod' ? 'checked' : '' }}>
                                 <span class="ml-3 font-bold text-gray-900">Bayar di Tempat (COD)</span>
                             </label>
                         </div>
                     </div>
+                    
+                    {{-- CATATAN: Saya menghapus bagian dropdown bank manual karena Anda menggunakan Midtrans Snap. Midtrans akan memunculkan pilihan bank secara otomatis di Popup. --}}
                 </div>
 
+                {{-- CATATAN --}}
                 <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Catatan Pesanan (Opsional)</label>
-                    <textarea name="catatan"
-                        class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2"
-                        rows="2"
-                        placeholder="Contoh: Tolong pilihkan tempe yang benar-benar matang.">{{ old('catatan') }}</textarea>
+                    <textarea name="catatan" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" rows="2" placeholder="Contoh: Tolong pilihkan tempe yang benar-benar matang.">{{ old('catatan') }}</textarea>
                 </div>
             </div>
 
+            {{-- SIDEBAR RINGKASAN --}}
             <div class="lg:col-span-5">
                 <div class="bg-gray-50 rounded-2xl p-6 lg:p-8 border border-gray-200 sticky top-24">
                     <h3 class="text-lg font-bold text-gray-900 mb-6 font-serif">Ringkasan Pesanan</h3>
 
                     <div class="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-                        @foreach($cartItems as $item)
+                        @foreach ($cartItems as $item)
                         <div class="flex gap-4">
-                            <div
-                                class="w-16 h-16 bg-white rounded-lg border border-gray-200 flex-shrink-0 overflow-hidden">
-                                @if($item['product']->gambar)
-                                <img src="{{ asset('storage/'.$item['product']->gambar) }}"
-                                    class="w-full h-full object-cover">
+                            <div class="w-16 h-16 bg-white rounded-lg border border-gray-200 flex-shrink-0 overflow-hidden">
+                                @if ($item['product']->gambar)
+                                <img src="{{ asset('storage/' . $item['product']->gambar) }}" class="w-full h-full object-cover">
                                 @else
                                 <div class="w-full h-full flex items-center justify-center text-xl">🌿</div>
                                 @endif
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-sm font-bold text-gray-900 line-clamp-1">{{ $item['product']->nama }}
-                                </h4>
-                                <p class="text-xs text-gray-500">{{ $item['quantity'] }} x Rp {{
-                                    number_format($item['harga'], 0, ',', '.') }}</p>
+                                <h4 class="text-sm font-bold text-gray-900 line-clamp-1">{{ $item['product']->nama }}</h4>
+                                <p class="text-xs text-gray-500">{{ $item['quantity'] }} x Rp {{ number_format($item['harga'], 0, ',', '.') }}</p>
                             </div>
                             <div class="text-sm font-bold text-gray-700">
                                 Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
@@ -206,18 +151,18 @@
                         </div>
                         <div class="flex justify-between items-center pt-4 border-t border-gray-200">
                             <span class="text-base font-bold text-gray-900">Total Pembayaran</span>
-                            <span class="text-2xl font-bold text-primary" id="grand-total-display">Rp {{
-                                number_format($subtotal, 0, ',', '.') }}</span>
+                            <span class="text-2xl font-bold text-primary" id="grand-total-display">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                         </div>
                     </div>
 
-                    <button type="submit"
-                        class="w-full mt-8 bg-primary hover:bg-green-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-200 transition-all transform hover:-translate-y-1 flex justify-center items-center gap-2">
-                        <span>Buat Pesanan</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                        </svg>
+                    <button type="submit" id="btn-submit-order" class="w-full mt-8 bg-primary hover:bg-green-800 text-white font-bold py-4 rounded-xl shadow-lg shadow-green-200 transition-all transform hover:-translate-y-1 flex justify-center items-center gap-2">
+                        <span id="btn-text">Buat Pesanan</span>
+                        <span id="btn-loading" class="hidden">
+                            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </span>
                     </button>
 
                     <p class="text-xs text-gray-400 text-center mt-4">
@@ -229,79 +174,133 @@
     </form>
 </div>
 
+{{-- SCRIPT AREA --}}
+<script src="https://app.{{ env('MIDTRANS_IS_PRODUCTION') ? '' : 'sandbox.' }}midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+
 <script>
-    const subtotal = {{ $subtotal }};
-    const shippingRadios = document.querySelectorAll('input[name="metode_pengiriman"]');
-    const shippingDisplay = document.getElementById('shipping-display');
-    const grandTotalDisplay = document.getElementById('grand-total-display');
-    const bankContainer = document.getElementById('bank-selection-container');
-    const paymentRadios = document.querySelectorAll('input[name="metode_pembayaran"]');
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // --- 1. SETUP VARIABEL ---
+        const subtotal = {{ $subtotal }};
+        const shippingRadios = document.querySelectorAll('input[name="metode_pengiriman"]');
+        const shippingDisplay = document.getElementById('shipping-display');
+        const grandTotalDisplay = document.getElementById('grand-total-display');
+        
+        const checkoutForm = document.getElementById('checkout-form');
+        const btnSubmit = document.getElementById('btn-submit-order');
+        const btnText = document.getElementById('btn-text');
+        const btnLoading = document.getElementById('btn-loading');
 
-    // 1. Logic Hitung Ongkir
-    function updateTotals() {
-        let shippingCost = 0;
-        shippingRadios.forEach(radio => {
-            if (radio.checked && radio.value === 'kurir') {
-                shippingCost = 15000;
+        // --- 2. LOGIC ONGKIR (Aman) ---
+        function updateTotals() {
+            let shippingCost = 0;
+            if (shippingRadios.length > 0) {
+                shippingRadios.forEach(radio => {
+                    if (radio.checked && radio.value === 'kurir') {
+                        shippingCost = 15000;
+                    }
+                });
             }
-        });
 
-        const total = subtotal + shippingCost;
-        const formatIDR = (num) => 'Rp ' + num.toLocaleString('id-ID');
+            const total = subtotal + shippingCost;
+            const formatIDR = (num) => 'Rp ' + num.toLocaleString('id-ID');
 
-        shippingDisplay.textContent = shippingCost === 0 ? 'Gratis' : formatIDR(shippingCost);
-        grandTotalDisplay.textContent = formatIDR(total);
-    }
-
-    // 2. Logic Tampilkan/Sembunyikan Dropdown Bank
-    function toggleBankSelect(show) {
-        if (show) {
-            bankContainer.classList.remove('hidden', 'opacity-0', 'h-0');
-            bankContainer.classList.add('opacity-100', 'h-auto', 'mt-2');
-        } else {
-            bankContainer.classList.add('hidden', 'opacity-0', 'h-0');
-            bankContainer.classList.remove('opacity-100', 'h-auto', 'mt-2');
+            if (shippingDisplay) shippingDisplay.textContent = shippingCost === 0 ? 'Gratis' : formatIDR(shippingCost);
+            if (grandTotalDisplay) grandTotalDisplay.textContent = formatIDR(total);
         }
-    }
 
-    // 3. CUSTOM DROPDOWN LOGIC (Agar warna hijau)
-    function toggleCustomDropdown() {
-        const dropdown = document.getElementById('custom-dropdown-options');
-        const arrow = document.getElementById('dropdown-arrow');
-        dropdown.classList.toggle('hidden');
-        arrow.classList.toggle('rotate-180');
-    }
-
-    function selectBank(value, label) {
-        // Update input hidden (yang dikirim ke server)
-        document.getElementById('bank_tujuan_input').value = value;
-        
-        // Update teks yang tampil
-        const textElement = document.getElementById('selected-bank-text');
-        textElement.textContent = label;
-        textElement.classList.remove('text-gray-500');
-        textElement.classList.add('text-gray-900', 'font-medium');
-        
-        // Tutup dropdown
-        toggleCustomDropdown();
-    }
-
-    // Tutup dropdown jika klik di luar
-    window.addEventListener('click', function(e) {
-        const dropdown = document.getElementById('custom-dropdown-options');
-        const trigger = document.getElementById('custom-dropdown-trigger');
-        if (!trigger.contains(e.target) && !dropdown.contains(e.target) && !dropdown.classList.contains('hidden')) {
-            toggleCustomDropdown();
+        // Jalankan saat load & saat radio berubah
+        if (shippingRadios.length > 0) {
+            shippingRadios.forEach(radio => radio.addEventListener('change', updateTotals));
+            updateTotals();
         }
+
+        // --- 3. LOGIC SUBMIT (AJAX + MIDTRANS) ---
+        if (checkoutForm) {
+            checkoutForm.addEventListener('submit', async function(e) {
+                e.preventDefault(); // MENCEGAH RELOAD HALAMAN
+                
+                // UI Loading
+                btnSubmit.disabled = true;
+                btnText.textContent = 'Memproses...';
+                btnLoading.classList.remove('hidden');
+
+                const formData = new FormData(checkoutForm);
+
+                try {
+                    const response = await fetch("{{ route('checkout.process') }}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "Accept": "application/json"
+                        },
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    console.log("Response Server:", result);
+
+                    if (!response.ok) {
+                        // Handle Error Validasi Laravel
+                        if(result.errors) {
+                            let msg = "Mohon periksa input Anda:\n";
+                            for(let key in result.errors) {
+                                msg += "- " + result.errors[key][0] + "\n";
+                            }
+                            alert(msg);
+                        } else {
+                            alert(result.message || "Terjadi kesalahan pada server.");
+                        }
+                        throw new Error('Server returned error');
+                    }
+
+                    // SUKSES
+                    if (result.status === 'success') {
+                        if (result.snap_token) {
+                            // --- POPUP MIDTRANS MUNCUL DISINI ---
+                            window.snap.pay(result.snap_token, {
+                                onSuccess: function(paymentResult){
+                                    window.location.href = result.redirect_url;
+                                },
+                                onPending: function(paymentResult){
+                                    window.location.href = result.redirect_url;
+                                },
+                                onError: function(paymentResult){
+                                    alert("Pembayaran gagal atau dibatalkan.");
+                                    resetBtn();
+                                },
+                                onClose: function(){
+                                    alert('Anda belum menyelesaikan pembayaran.');
+                                    // Opsional: Tetap di halaman ini atau redirect
+                                    // window.location.href = result.redirect_url;
+                                }
+                            });
+                        } else {
+                            // KASUS COD
+                            window.location.href = result.redirect_url;
+                        }
+                    } else {
+                        alert(result.message || "Gagal memproses pesanan.");
+                        resetBtn();
+                    }
+
+                } catch (error) {
+                    console.error("Error JS:", error);
+                    // Jangan alert jika error validasi (sudah dihandle diatas)
+                    if(error.message !== 'Server returned error') {
+                        alert("Terjadi kesalahan sistem. Silakan coba lagi.");
+                    }
+                    resetBtn();
+                }
+            });
+        }
+
+        function resetBtn() {
+            btnSubmit.disabled = false;
+            btnText.textContent = 'Buat Pesanan';
+            btnLoading.classList.add('hidden');
+        }
+
     });
-
-    // Inisialisasi
-    shippingRadios.forEach(radio => radio.addEventListener('change', updateTotals));
-    updateTotals();
-    
-    // Cek state awal (misal jika ada error validasi dan kembali ke halaman ini)
-    const isTransfer = document.querySelector('input[name="metode_pembayaran"]:checked')?.value === 'transfer_bank';
-    toggleBankSelect(isTransfer);
-
 </script>
 @endsection
