@@ -3,75 +3,157 @@
 @section('title', 'Daftar Pesanan')
 
 @section('content')
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-    <div>
-        <h1 style="color: var(--primary); margin-bottom: 0.5rem;">Daftar Pesanan</h1>
-        <p style="color: #666;">Kelola pesanan masuk dan status pengiriman</p>
-    </div>
-    
-    <div style="border: 1px solid #ddd; padding: 0.25rem; border-radius: 6px; background: white;">
-        <a href="{{ route('admin.orders.index') }}" class="btn {{ !request('status') || request('status') == 'all' ? 'btn-primary' : '' }}" style="padding: 0.5rem 1rem; border-radius: 4px; display: inline-block;">Semua</a>
-        <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}" class="btn {{ request('status') == 'pending' ? 'btn-primary' : '' }}" style="padding: 0.5rem 1rem; border-radius: 4px; display: inline-block;">Pending</a>
-        <a href="{{ route('admin.orders.index', ['status' => 'diproses']) }}" class="btn {{ request('status') == 'diproses' ? 'btn-primary' : '' }}" style="padding: 0.5rem 1rem; border-radius: 4px; display: inline-block;">Diproses</a>
-        <a href="{{ route('admin.orders.index', ['status' => 'selesai']) }}" class="btn {{ request('status') == 'selesai' ? 'btn-primary' : '' }}" style="padding: 0.5rem 1rem; border-radius: 4px; display: inline-block;">Selesai</a>
-    </div>
-</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-<div class="card">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>No. Pesanan</th>
-                <th>Tanggal</th>
-                <th>Pembeli</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($orders as $order)
-                <tr>
-                    <td>
-                        <strong>{{ $order->nomor_pesanan }}</strong>
-                        <div style="font-size: 0.8rem; color: #888;">{{ $order->items_count }} item</div>
-                    </td>
-                    <td>{{ $order->created_at->format('d M H:i') }}</td>
-                    <td>
-                        {{ $order->nama_pembeli }}
-                        <div style="font-size: 0.8rem; color: #888;">{{ $order->telepon_pembeli }}</div>
-                    </td>
-                    <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
-                    <td>
-                        @php
-                            $colors = [
-                                'pending' => '#FFC107',
-                                'diproses' => '#2196F3',
-                                'dikirim' => '#9C27B0',
-                                'selesai' => '#4CAF50',
-                                'dibatalkan' => '#F44336'
-                            ];
-                        @endphp
-                        <span class="badge" style="background: {{ $colors[$order->status] ?? '#999' }}; padding: 0.35rem 0.75rem; border-radius: 12px; color: black; color: white;">
-                            {{ ucfirst($order->status) }}
-                        </span>
-                    </td>
-                    <td>
-                        <a href="{{ route('admin.orders.show', $order) }}" class="btn btn-accent" style="padding: 0.5rem 1rem; font-size: 0.875rem;">Lihat</a>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 2rem; color: #666;">
-                        {{ request('status') ? 'Tidak ada pesanan dengan status '.request('status') : 'Belum ada pesanan masuk' }}
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+        <div>
+            <h2 class="text-3xl font-serif font-bold text-gray-900 tracking-tight">Pesanan Masuk</h2>
+            <p class="text-sm text-gray-500 mt-2 font-medium">Kelola transaksi dan status pengiriman pelanggan.</p>
+        </div>
 
-    <div style="padding: 1rem;">
-        {{ $orders->links() }}
+        <div class="w-full md:w-auto">
+            <form action="{{ route('admin.orders.index') }}" method="GET" class="relative">
+                <input type="hidden" name="status" value="{{ request('status') }}">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </span>
+                <input type="text" name="search" value="{{ request('search') }}"
+                    placeholder="Cari No. Pesanan / Pembeli..."
+                    class="w-full md:w-64 pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:border-primary focus:ring-1 focus:ring-primary shadow-sm">
+            </form>
+        </div>
+    </div>
+
+    <div class="border-b border-gray-200 mb-6 overflow-x-auto">
+        <nav class="-mb-px flex space-x-6 min-w-max">
+            <a href="{{ route('admin.orders.index') }}"
+                class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors {{ !request('status') ? 'border-primary text-primary' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Semua Pesanan
+            </a>
+            <a href="{{ route('admin.orders.index', ['status' => 'pending']) }}"
+                class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors {{ request('status') == 'pending' ? 'border-yellow-500 text-yellow-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Pending
+            </a>
+            <a href="{{ route('admin.orders.index', ['status' => 'diproses']) }}"
+                class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors {{ request('status') == 'diproses' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Diproses
+            </a>
+            <a href="{{ route('admin.orders.index', ['status' => 'dikirim']) }}"
+                class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors {{ request('status') == 'dikirim' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Dikirim
+            </a>
+            <a href="{{ route('admin.orders.index', ['status' => 'selesai']) }}"
+                class="whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm transition-colors {{ request('status') == 'selesai' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                Selesai
+            </a>
+        </nav>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50/50 border-b border-gray-200 text-left">
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Pesanan</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Pembeli</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Total & Tanggal
+                        </th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">
+                            Status</th>
+                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Aksi
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($orders as $order)
+                    <tr class="group hover:bg-gray-50 transition-colors duration-200">
+                        <td class="px-6 py-5">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 border border-gray-200 text-lg">
+                                    🧾
+                                </div>
+                                <div>
+                                    <span class="font-mono text-sm font-bold text-gray-900 block">{{
+                                        $order->nomor_pesanan }}</span>
+                                    <span class="text-xs text-gray-500">{{ $order->items_count }} Item</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-5">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-gray-800">{{ $order->nama_pembeli }}</span>
+                                <span class="text-xs text-gray-500">{{ $order->telepon_pembeli }}</span>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-5">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-primary">Rp {{ number_format($order->total, 0, ',',
+                                    '.') }}</span>
+                                <span class="text-[10px] text-gray-400 mt-0.5">{{ $order->created_at->format('d M Y,
+                                    H:i') }}</span>
+                            </div>
+                        </td>
+
+                        <td class="px-6 py-5 text-center">
+                            @php
+                            $statusClass = match($order->status) {
+                            'pending' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
+                            'diproses' => 'bg-blue-50 text-blue-700 border-blue-200',
+                            'dikirim' => 'bg-purple-50 text-purple-700 border-purple-200',
+                            'selesai' => 'bg-green-50 text-green-700 border-green-200',
+                            'dibatalkan' => 'bg-red-50 text-red-700 border-red-200',
+                            default => 'bg-gray-50 text-gray-600'
+                            };
+                            @endphp
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border {{ $statusClass }}">
+                                {{ ucfirst($order->status) }}
+                            </span>
+                        </td>
+
+                        <td class="px-6 py-5 text-right">
+                            <a href="{{ route('admin.orders.show', $order) }}"
+                                class="inline-flex items-center px-3 py-1.5 bg-white border border-gray-200 text-gray-600 text-xs font-bold rounded-lg hover:bg-gray-50 hover:text-primary transition shadow-sm gap-1">
+                                <span>Detail</span>
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-16 text-center text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <div
+                                    class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-3 text-gray-300">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <p class="text-sm">Tidak ada pesanan ditemukan.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($orders->hasPages())
+        <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+            {{ $orders->links() }}
+        </div>
+        @endif
     </div>
 </div>
 @endsection
