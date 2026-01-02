@@ -215,7 +215,7 @@
                     <ul class="space-y-2 text-sm text-gray-400">
                         <li>WhatsApp: 0812-3456-7890</li>
                         <li>Email: hello@tempe3puteri.com</li>
-                        <li>Lokasi: Jawa Tengah, Indonesia</li>
+                        <li>Lokasi: Sumatera Selatan, Indonesia</li>
                     </ul>
                 </div>
             </div>
