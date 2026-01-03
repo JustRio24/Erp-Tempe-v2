@@ -17,7 +17,7 @@
                     Selamat Datang, {{ auth()->user()->name ?? 'Administrator' }}
                 </h1>
                 <p class="text-green-100/80 mt-2 max-w-xl text-lg font-light">
-                    Berikut adalah laporan kinerja operasional dan finansial Tempe 3 Puteri untuk hari ini.
+                    Laporan kinerja operasional dan finansial Tempe 3 Puteri hari ini.
                 </p>
             </div>
             <div
@@ -81,7 +81,6 @@
         <div
             class="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-3xl shadow-xl text-white group hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
             <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
-
             <div class="flex justify-between items-start mb-4 relative z-10">
                 <div class="p-3 bg-white/10 rounded-2xl text-yellow-400">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,8 +99,158 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-        <div class="lg:col-span-2 space-y-8">
+        <div class="lg:col-span-2 space-y-6">
+            <div
+                class="bg-gradient-to-b from-blue-600 to-blue-800 rounded-3xl shadow-xl shadow-blue-900/20 text-white p-8 relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl">
+                </div>
 
+                <div class="relative z-10">
+                    <div class="flex flex-col md:flex-row justify-between items-start mb-8">
+                        <div>
+                            <h3 class="font-bold text-2xl font-serif">Prakiraan Cuaca</h3>
+                            <div class="flex items-center gap-2 mt-1 opacity-80">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                    </path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <span class="text-sm font-medium">{{ config('erp.weather_city', 'Jakarta') }}</span>
+                            </div>
+                        </div>
+                        <div class="text-right mt-4 md:mt-0">
+                            @php $todayWeather = $forecast[0] ?? null; @endphp
+                            <div class="flex items-center gap-3 justify-end">
+                                <span class="text-5xl">{{ $todayWeather['icon'] ?? '🌤️' }}</span>
+                                <div>
+                                    <div class="text-3xl font-bold">{{ $todayWeather['suhu_avg'] }}°C</div>
+                                    <div class="text-sm font-medium text-blue-200">{{ $todayWeather['klasifikasi'] }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 md:grid-cols-7 gap-3 mb-8">
+                        @foreach(array_slice($forecast, 0, 7) as $day)
+                        <div
+                            class="text-center p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
+                            <p class="text-[10px] text-blue-200 uppercase tracking-wider mb-1">{{
+                                $day['tanggal_singkat'] }}</p>
+                            <p class="text-lg mb-1">{{ $day['icon'] }}</p>
+                            <p class="text-xs font-bold">{{ $day['suhu_avg'] }}°</p>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <div class="mt-6 pt-6 border-t border-white/10">
+                        @if(count($weatherRecommendations) > 0)
+                        <div class="bg-yellow-500/20 backdrop-blur-md border border-yellow-400/30 rounded-2xl p-5">
+                            <h4 class="text-yellow-200 font-bold flex items-center gap-2 mb-3">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                    </path>
+                                </svg>
+                                Rekomendasi & Peringatan
+                            </h4>
+                            <div class="space-y-2">
+                                @foreach($weatherRecommendations as $rec)
+                                <div class="flex gap-3 text-sm text-yellow-50 items-start">
+                                    <span class="mt-0.5">{{ $rec['icon'] ?? '⚠️' }}</span>
+                                    <span class="leading-relaxed">{{ $rec['message'] }}</span>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @else
+                        <div
+                            class="bg-green-500/20 backdrop-blur-md border border-green-400/30 rounded-2xl p-5 flex items-center gap-4">
+                            <div
+                                class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-2xl">
+                                ✅</div>
+                            <div>
+                                <h4 class="text-green-200 font-bold">Cuaca Kondusif</h4>
+                                <p class="text-sm text-green-100/80 mt-0.5">Tidak ada peringatan khusus. Kondisi ideal
+                                    untuk produksi tempe.</p>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 h-full">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-50">
+                    <h3 class="font-bold text-gray-900 text-lg font-serif">Pusat Notifikasi</h3>
+                    <span class="flex h-3 w-3 relative">
+                        <span
+                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                    </span>
+                </div>
+
+                <div class="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                    @if(count($inventoryAlerts) > 0)
+                    <div class="mb-4">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Inventori</p>
+                        @foreach($inventoryAlerts as $alert)
+                        <div
+                            class="p-3 mb-2 rounded-2xl bg-orange-50 border border-orange-100 flex gap-3 items-start hover:bg-orange-100 transition">
+                            <span class="text-lg mt-0.5">{{ $alert['icon'] ?? '📦' }}</span>
+                            <div>
+                                <p class="text-xs font-bold text-orange-800 mb-0.5">Stok Menipis</p>
+                                <p class="text-xs text-orange-700 leading-snug">{{ $alert['message'] }}</p>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    @if(count($notifications) > 0)
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Sistem</p>
+                        @foreach(array_slice($notifications, 0, 5) as $notif)
+                        <div
+                            class="p-3 mb-2 rounded-2xl bg-white border border-gray-100 shadow-sm flex gap-3 items-start hover:shadow-md transition">
+                            <div
+                                class="w-2 h-2 rounded-full mt-1.5 flex-shrink-0 {{ $notif['type'] === 'danger' ? 'bg-red-500' : 'bg-blue-500' }}">
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-xs text-gray-700 leading-snug">{{ $notif['message'] }}</p>
+                                @if(isset($notif['link']))
+                                <a href="{{ $notif['link'] }}"
+                                    class="text-[10px] font-bold text-primary hover:underline mt-1.5 block">Lihat Detail
+                                    →</a>
+                                @endif
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @endif
+
+                    @if(count($notifications) == 0 && count($inventoryAlerts) == 0)
+                    <div class="text-center py-12">
+                        <div
+                            class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-300 text-2xl">
+                            🔕</div>
+                        <p class="text-sm text-gray-500 font-medium">Tidak ada notifikasi baru.</p>
+                        <p class="text-xs text-gray-400 mt-1">Semua sistem berjalan normal.</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div class="lg:col-span-2 space-y-8">
             <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                     <div>
@@ -124,7 +273,6 @@
                 @php
                 $latest = $kedelaiTrend->last();
                 $previous = count($kedelaiTrend) > 1 ? $kedelaiTrend[count($kedelaiTrend)-2] : null;
-                $avgPrice = $kedelaiTrend->avg('harga_satuan');
                 @endphp
 
                 <div class="mt-8 pt-6 border-t border-gray-100">
@@ -138,7 +286,7 @@
                         <div class="p-4 rounded-2xl bg-gray-50 border border-gray-100">
                             <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Status Tren</p>
                             @if(!$previous)
-                            <p class="text-sm text-gray-600">Menunggu data historis lebih lanjut.</p>
+                            <p class="text-sm text-gray-600">Menunggu data historis.</p>
                             @else
                             @php
                             $priceDiff = $latest->harga_satuan - $previous->harga_satuan;
@@ -176,151 +324,116 @@
                         <p class="text-sm text-indigo-900 leading-snug">
                             @if(isset($priceDiff))
                             @if($priceDiff > 0)
-                            Audit efisiensi produksi untuk menjaga margin laba.
-                            @elseif($priceDiff < 0) Waktu yang tepat untuk meningkatkan stok gudang (Stockpiling). @else
-                                Pertahankan level stok normal dan pantau pasar. @endif @else Data belum cukup untuk
-                                memberikan saran spesifik. @endif </p>
+                            Audit efisiensi produksi untuk menjaga margin.
+                            @elseif($priceDiff < 0) Waktu yang tepat untuk meningkatkan stok gudang. @else Pertahankan
+                                level stok normal dan pantau pasar. @endif @else Data belum cukup untuk memberikan
+                                saran. @endif </p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-gray-900 font-serif">Rincian Keuangan</h3>
-                <span class="text-xs font-medium bg-gray-100 px-3 py-1 rounded-full text-gray-500">Bulan Ini</span>
-            </div>
-            <div class="grid grid-cols-3 divide-x divide-gray-100">
-                <div class="p-6 text-center group hover:bg-gray-50 transition">
-                    <p class="text-xs font-bold text-green-600 uppercase tracking-wider mb-2">Pemasukan</p>
-                    <p class="text-xl font-bold text-gray-900 group-hover:text-green-700 transition">Rp {{
-                        number_format($monthlyIncome, 0, ',', '.') }}</p>
-                </div>
-                <div class="p-6 text-center group hover:bg-gray-50 transition">
-                    <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-2">Pengeluaran</p>
-                    <p class="text-xl font-bold text-gray-900 group-hover:text-red-700 transition">Rp {{
-                        number_format($monthlyExpense, 0, ',', '.') }}</p>
-                </div>
-                <div class="p-6 text-center group hover:bg-gray-50 transition">
-                    <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">Laba Bersih</p>
-                    <p class="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition">Rp {{
-                        number_format($monthlyNetProfit, 0, ',', '.') }}</p>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <div class="lg:col-span-1 space-y-6">
-
         <div
-            class="bg-gradient-to-b from-blue-500 to-blue-600 rounded-3xl shadow-xl shadow-blue-500/20 text-white p-6 relative overflow-hidden">
-            <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-white/20 rounded-full blur-2xl"></div>
-
-            <div class="relative z-10">
-                <div class="flex justify-between items-start mb-6">
-                    <div>
-                        <h3 class="font-bold text-lg">Cuaca</h3>
-                        <p class="text-blue-100 text-xs">{{ config('erp.weather_city', 'Jakarta') }}</p>
-                    </div>
-                    <div class="text-3xl">
-                        @php $todayWeather = $forecast[0] ?? null; @endphp
-                        {{ $todayWeather['icon'] ?? '🌤️' }}
-                    </div>
+            class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6 h-full flex flex-col justify-between">
+            <div>
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-50">
+                    <h3 class="font-bold text-gray-900 font-serif">Rincian Keuangan</h3>
+                    <span class="text-xs font-medium bg-gray-100 px-3 py-1 rounded-full text-gray-500">Bulan Ini</span>
                 </div>
 
-                @if($todayWeather)
-                <div class="mb-6">
-                    <span class="text-4xl font-bold">{{ $todayWeather['suhu_avg'] }}°C</span>
-                    <p class="text-blue-100 text-sm font-medium">{{ $todayWeather['klasifikasi'] }}</p>
-                </div>
-                @endif
-
-                <div class="flex justify-between gap-2 mt-4 pt-4 border-t border-white/20">
-                    @foreach(array_slice($forecast, 1, 4) as $day)
-                    <div class="text-center">
-                        <p class="text-[10px] text-blue-100 uppercase mb-1">{{
-                            \Carbon\Carbon::parse($day['tanggal'])->format('D') }}</p>
-                        <p class="text-sm">{{ $day['icon'] }}</p>
+                <div class="space-y-4">
+                    <div class="p-4 rounded-2xl bg-green-50 border border-green-100">
+                        <p class="text-xs font-bold text-green-600 uppercase tracking-wider mb-1">Pemasukan</p>
+                        <p class="text-xl font-bold text-green-700">Rp {{ number_format($monthlyIncome, 0, ',', '.') }}
+                        </p>
                     </div>
-                    @endforeach
+                    <div class="p-4 rounded-2xl bg-red-50 border border-red-100">
+                        <p class="text-xs font-bold text-red-600 uppercase tracking-wider mb-1">Pengeluaran</p>
+                        <p class="text-xl font-bold text-red-700">Rp {{ number_format($monthlyExpense, 0, ',', '.') }}
+                        </p>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-blue-50 border border-blue-100 mt-2">
+                        <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Laba Bersih</p>
+                        <p class="text-xl font-bold text-blue-800">Rp {{ number_format($monthlyNetProfit, 0, ',', '.')
+                            }}</p>
+                    </div>
                 </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <a href="{{ route('admin.finance.index') }}"
+                    class="text-sm text-primary font-bold hover:underline">Lihat Laporan Lengkap →</a>
             </div>
         </div>
-
-        <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="font-bold text-gray-900 text-lg font-serif">Smart Alerts</h3>
-                <span class="flex h-3 w-3 relative">
-                    <span
-                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                </span>
-            </div>
-
-            <div class="space-y-4">
-                @if(count($notifications) > 0)
-                @foreach(array_slice($notifications, 0, 3) as $notif)
-                <div class="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm flex gap-3 items-start">
-                    <div
-                        class="w-2 h-2 rounded-full mt-2 flex-shrink-0 {{ $notif['type'] === 'danger' ? 'bg-red-500' : 'bg-yellow-500' }}">
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-600 leading-snug">{{ $notif['message'] }}</p>
-                        @if(isset($notif['link']))
-                        <a href="{{ $notif['link'] }}"
-                            class="text-[10px] font-bold text-primary hover:underline mt-1 block">Tindak Lanjut →</a>
-                        @endif
-                    </div>
-                </div>
-                @endforeach
-                @endif
-
-                @if(count($inventoryAlerts) > 0)
-                @foreach($inventoryAlerts as $alert)
-                <div class="p-3 rounded-2xl bg-orange-50 border border-orange-100 flex gap-3 items-start">
-                    <span class="text-lg">{{ $alert['icon'] ?? '📦' }}</span>
-                    <div>
-                        <p class="text-xs font-bold text-orange-800 mb-0.5">Stok Menipis</p>
-                        <p class="text-xs text-orange-700 leading-snug">{{ $alert['message'] }}</p>
-                    </div>
-                </div>
-                @endforeach
-                @endif
-
-                @if(count($notifications) == 0 && count($inventoryAlerts) == 0)
-                <div class="text-center py-8">
-                    <span class="text-4xl grayscale opacity-50">✅</span>
-                    <p class="text-sm text-gray-400 mt-2">Semua sistem aman terkendali.</p>
-                </div>
-                @endif
-            </div>
-        </div>
-
-        <div class="bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-gray-900">Produksi Aktif</h3>
-                <a href="{{ route('admin.production.index') }}"
-                    class="text-xs text-primary font-bold hover:underline">Lihat Semua</a>
-            </div>
-            <div class="space-y-3">
-                @forelse($activeBatches->take(3) as $batch)
-                <div class="flex items-center justify-between pb-3 border-b border-gray-50 last:border-0 last:pb-0">
-                    <div>
-                        <p class="text-xs font-bold text-gray-800">{{ $batch->kode_batch }}</p>
-                        <p class="text-[10px] text-gray-400">{{ $batch->tanggal_mulai->format('d M, H:i') }}</p>
-                    </div>
-                    <span class="px-2 py-1 bg-blue-50 text-blue-600 text-[10px] font-bold rounded-lg">{{ $batch->status
-                        }}</span>
-                </div>
-                @empty
-                <p class="text-xs text-gray-400 text-center py-2">Tidak ada batch aktif.</p>
-                @endforelse
-            </div>
-        </div>
-
     </div>
 </div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+        <div class="px-6 py-5 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+            <h3 class="font-bold text-gray-900">Stok Rendah</h3>
+            <a href="{{ route('admin.materials.index') }}" class="text-xs text-primary font-bold hover:underline">Lihat
+                Semua</a>
+        </div>
+        <div class="overflow-x-auto flex-1">
+            <table class="w-full text-sm text-left">
+                <tbody class="divide-y divide-gray-50">
+                    @forelse($lowStockProducts->take(5) as $product)
+                    <tr class="hover:bg-gray-50/50">
+                        <td class="px-6 py-4 font-medium text-gray-900">{{ $product->nama }}</td>
+                        <td class="px-6 py-4 text-gray-500">{{ $product->stok_tersedia }} {{ $product->satuan }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase {{ $product->stok_tersedia == 0 ? 'bg-red-100 text-red-700' : 'bg-orange-100 text-orange-700' }}">
+                                {{ $product->checkStockStatus() }}
+                            </span>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="3" class="px-6 py-8 text-center text-gray-400 text-xs">Stok aman.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+        <div class="px-6 py-5 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
+            <h3 class="font-bold text-gray-900">Produksi Berjalan</h3>
+            <a href="{{ route('admin.production.index') }}" class="text-xs text-primary font-bold hover:underline">Lihat
+                Semua</a>
+        </div>
+        <div class="overflow-x-auto flex-1">
+            <table class="w-full text-sm text-left">
+                <tbody class="divide-y divide-gray-50">
+                    @forelse($activeBatches->take(5) as $batch)
+                    <tr class="hover:bg-gray-50/50">
+                        <td class="px-6 py-4 font-mono text-gray-600 text-xs">{{ $batch->kode_batch }}</td>
+                        <td class="px-6 py-4">
+                            <span
+                                class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-100 text-blue-700">{{
+                                $batch->status }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-right text-gray-500 text-xs">{{ $batch->tanggal_mulai->format('d M')
+                            }}</td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="3" class="px-6 py-8 text-center text-gray-400 text-xs">Tidak ada produksi aktif.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 </div>
 
 <script>
@@ -329,9 +442,8 @@
         const labels = {!! json_encode($kedelaiTrend->map(fn($t) => $t->created_at->format('d/m'))->toArray()) !!};
         const prices = {!! json_encode($kedelaiTrend->pluck('harga_satuan')->toArray()) !!};
 
-        // Create Gradient
         const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(46, 86, 53, 0.2)'); // Brand Green Opacity
+        gradient.addColorStop(0, 'rgba(46, 86, 53, 0.2)');
         gradient.addColorStop(1, 'rgba(46, 86, 53, 0)');
 
         new Chart(ctx, {
@@ -345,62 +457,23 @@
                     backgroundColor: gradient,
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4, // Smooth Curve
+                    tension: 0.4,
                     pointBackgroundColor: '#ffffff',
                     pointBorderColor: '#2E5635',
                     pointBorderWidth: 2,
                     pointRadius: 4,
-                    pointHoverRadius: 6,
-                    pointHoverBackgroundColor: '#2E5635',
-                    pointHoverBorderColor: '#fff'
+                    pointHoverRadius: 6
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#1a3c27',
-                        titleColor: '#fff',
-                        bodyColor: '#fff',
-                        padding: 12,
-                        cornerRadius: 8,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
-                            }
-                        }
-                    }
-                },
+                plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        border: { display: false },
-                        grid: {
-                            color: '#f3f4f6',
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            font: { family: "'Inter', sans-serif", size: 11 },
-                            color: '#9ca3af',
-                            callback: function(value) {
-                                return (value / 1000) + 'k';
-                            }
-                        }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: {
-                            font: { family: "'Inter', sans-serif", size: 11 },
-                            color: '#9ca3af'
-                        }
-                    }
+                    y: { border: { display: false }, grid: { color: '#f3f4f6', borderDash: [5, 5] }, ticks: { font: { size: 11 }, color: '#9ca3af', callback: function(val) { return (val/1000) + 'k'; } } },
+                    x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#9ca3af' } }
                 },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
+                interaction: { intersect: false, mode: 'index' }
             }
         });
     });
