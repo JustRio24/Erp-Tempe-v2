@@ -7,7 +7,7 @@
     <div class="max-w-4xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row">
 
         <div class="hidden md:block md:w-1/2 relative bg-primary">
-            <img src="https://images.unsplash.com/photo-1626505776602-57b16c52bb88?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            <img src="{{ asset('login.jpg') }}"
                 alt="Tempe Masak" class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay">
             <div class="absolute inset-0 bg-gradient-to-t from-primary to-transparent opacity-90"></div>
 

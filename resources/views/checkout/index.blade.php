@@ -27,22 +27,22 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="col-span-2 md:col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
-                            <input type="text" name="nama_pembeli" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" value="{{ old('nama_pembeli') }}" placeholder="Contoh: Budi Santoso" required>
+                            <input type="text" name="nama_pembeli" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" value="{{ old('nama_pembeli', auth()->user()->name ?? '') }}" placeholder="Contoh: Budi Santoso" required>
                         </div>
 
                         <div class="col-span-2 md:col-span-1">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Nomor Telepon (WhatsApp) <span class="text-red-500">*</span></label>
-                            <input type="tel" name="telepon_pembeli" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" value="{{ old('telepon_pembeli') }}" placeholder="0812..." required>
+                            <input type="tel" name="telepon_pembeli" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" value="{{ old('telepon_pembeli', auth()->user()->whatsapp ?? '') }}" placeholder="0812..." required>
                         </div>
 
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
-                            <input type="email" name="email_pembeli" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" value="{{ old('email_pembeli') }}" placeholder="email@contoh.com" required>
+                            <input type="email" name="email_pembeli" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" value="{{ old('email_pembeli', auth()->user()->email ?? '') }}" placeholder="email@contoh.com" required>
                         </div>
 
-                        <div class="col-span-2">
+                        <div class="col-span-2 {{ old('metode_pengiriman', 'ambil_sendiri') === 'kurir' ? '' : 'hidden' }}" id="address-container">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap <span class="text-red-500">*</span></label>
-                            <textarea name="alamat_pembeli" rows="3" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" placeholder="Nama Jalan, RT/RW, Kelurahan, Kecamatan..." required>{{ old('alamat_pembeli') }}</textarea>
+                            <textarea name="alamat_pembeli" id="alamat_pembeli" rows="3" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring-primary transition-colors p-2" placeholder="Nama Jalan, RT/RW, Kelurahan, Kecamatan..." {{ old('metode_pengiriman') === 'kurir' ? 'required' : '' }}>{{ old('alamat_pembeli') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -191,15 +191,33 @@
         const btnText = document.getElementById('btn-text');
         const btnLoading = document.getElementById('btn-loading');
 
-        // --- 2. LOGIC ONGKIR (Aman) ---
+        const addressContainer = document.getElementById('address-container');
+        const addressTextarea = document.getElementById('alamat_pembeli');
+
+        // --- 2. LOGIC ONGKIR & ALAMAT (Aman) ---
         function updateTotals() {
             let shippingCost = 0;
+            let showAddress = false;
+            
             if (shippingRadios.length > 0) {
                 shippingRadios.forEach(radio => {
-                    if (radio.checked && radio.value === 'kurir') {
-                        shippingCost = 15000;
+                    if (radio.checked) {
+                        if (radio.value === 'kurir') {
+                            shippingCost = 15000;
+                            showAddress = true;
+                        }
                     }
                 });
+            }
+
+            // Toggle Address Visibility
+            if (showAddress) {
+                addressContainer.classList.remove('hidden');
+                addressTextarea.required = true;
+            } else {
+                addressContainer.classList.add('hidden');
+                addressTextarea.required = false;
+                addressTextarea.value = ''; // Opsional: bersihkan alamat jika ambil sendiri
             }
 
             const total = subtotal + shippingCost;

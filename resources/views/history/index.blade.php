@@ -11,7 +11,7 @@
                 <h1 class="text-3xl font-serif font-bold text-gray-900">Riwayat Pesanan</h1>
                 <p class="text-gray-500 mt-1">Lacak status pesanan tempe Anda di sini.</p>
             </div>
-            <a href="/" class="text-sm font-semibold text-primary hover:text-green-800 transition">
+            <a href="{{ route('catalog.index') }}" class="text-sm font-semibold text-primary hover:text-green-800 transition">
                 &larr; Kembali Belanja
             </a>
         </div>
@@ -94,7 +94,7 @@
                     <h3 class="mt-2 text-sm font-medium text-gray-900">Belum ada pesanan</h3>
                     <p class="mt-1 text-sm text-gray-500">Mulai belanja tempe segar sekarang.</p>
                     <div class="mt-6">
-                        <a href="/" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                        <a href="{{ route('catalog.index') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
                             Belanja Sekarang
                         </a>
                     </div>
@@ -110,7 +110,7 @@
 
 {{-- Script Midtrans (Penting agar tombol Bayar berfungsi) --}}
 @if($orders->contains('status', 'pending'))
-    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <script src="https://app.{{ env('MIDTRANS_IS_PRODUCTION') ? '' : 'sandbox.' }}midtrans.com/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY', config('midtrans.client_key')) }}"></script>
 @endif
 
 @endsection

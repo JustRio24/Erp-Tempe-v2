@@ -95,7 +95,7 @@
 
             <div class="mt-auto">
                 @if($product->is_active && $product->stok_tersedia > 0)
-                <form action="{{ route('cart.add', $product) }}" method="POST" class="flex flex-col sm:flex-row gap-4">
+                <form action="{{ route('cart.add', $product) }}" method="POST" class="ajax-cart-form flex flex-col sm:flex-row gap-4">
                     @csrf
                     <div class="w-full sm:w-32">
                         <label class="block text-xs font-medium text-gray-700 mb-1">Jumlah</label>
@@ -117,6 +117,20 @@
                         </button>
                     </div>
                 </form>
+                @elseif($product->is_active && $product->stok_tersedia <= 0)
+                <div class="flex flex-col sm:flex-row gap-4 opacity-75">
+                    <div class="w-full sm:w-32">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Jumlah</label>
+                        <input type="number" disabled value="0" class="w-full text-center font-bold border-2 border-gray-100 bg-gray-50 rounded-xl py-3 text-gray-400 cursor-not-allowed">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs font-medium text-transparent mb-1">Action</label>
+                        <button type="button" disabled
+                            class="w-full bg-gray-300 text-gray-500 font-bold text-lg py-3 rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
+                            Habis
+                        </button>
+                    </div>
+                </div>
                 @else
                 <div
                     class="w-full bg-gray-100 text-gray-400 font-bold py-4 rounded-xl text-center border-2 border-dashed border-gray-300">
@@ -159,4 +173,114 @@
     @endif
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const forms = document.querySelectorAll('.ajax-cart-form');
+    
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalContent = submitBtn.innerHTML;
+            
+            // Set loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Memproses...
+            `;
+            
+            const formData = new FormData(form);
+            const url = form.getAttribute('action');
+            const quantityInput = form.querySelector('input[name="quantity"]');
+            const quantity = parseInt(quantityInput.value);
+            const maxStock = parseInt(quantityInput.getAttribute('max'));
+
+            if (quantity > maxStock) {
+                submitBtn.classList.remove('bg-primary', 'hover:bg-green-800');
+                submitBtn.classList.add('bg-red-600');
+                submitBtn.innerHTML = 'Stok Melebihi!';
+                
+                setTimeout(() => {
+                    submitBtn.classList.remove('bg-red-600');
+                    submitBtn.classList.add('bg-primary', 'hover:bg-green-800');
+                    submitBtn.innerHTML = originalContent;
+                    submitBtn.disabled = false;
+                }, 2000);
+                return;
+            }
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update badge
+                    const badgeContainers = [
+                        document.getElementById('cart-badge-container'),
+                        document.getElementById('cart-badge-container-mobile')
+                    ];
+                    
+                    badgeContainers.forEach((container, index) => {
+                        if (container) {
+                            const isMobile = index === 1;
+                            const badgeClass = isMobile ? 'cart-badge-mobile absolute -top-1 -right-1 bg-secondary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full' 
+                                                        : 'cart-badge absolute -top-2 -right-3 bg-secondary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm';
+                            
+                            container.innerHTML = `<span class="${badgeClass}">${data.cart_count}</span>`;
+                        }
+                    });
+                    
+                    // Success feedback
+                    submitBtn.classList.remove('bg-primary', 'hover:bg-green-800');
+                    submitBtn.classList.add('bg-green-600');
+                    submitBtn.innerHTML = 'Berhasil Ditambahkan!';
+                    
+                    setTimeout(() => {
+                        submitBtn.classList.remove('bg-green-600');
+                        submitBtn.classList.add('bg-primary', 'hover:bg-green-800');
+                        submitBtn.innerHTML = originalContent;
+                        submitBtn.disabled = false;
+                    }, 2000);
+                } else {
+                    submitBtn.classList.remove('bg-primary', 'hover:bg-green-800');
+                    submitBtn.classList.add('bg-red-600');
+                    submitBtn.innerHTML = data.message || 'Gagal!';
+                    
+                    setTimeout(() => {
+                        submitBtn.classList.remove('bg-red-600');
+                        submitBtn.classList.add('bg-primary', 'hover:bg-green-800');
+                        submitBtn.innerHTML = originalContent;
+                        submitBtn.disabled = false;
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                submitBtn.classList.remove('bg-primary', 'hover:bg-green-800');
+                submitBtn.classList.add('bg-red-600');
+                submitBtn.innerHTML = 'Sistem Error';
+                
+                setTimeout(() => {
+                    submitBtn.classList.remove('bg-red-600');
+                    submitBtn.classList.add('bg-primary', 'hover:bg-green-800');
+                    submitBtn.innerHTML = originalContent;
+                    submitBtn.disabled = false;
+                }, 2000);
+            });
+        });
+    });
+});
+</script>
 @endsection

@@ -47,6 +47,9 @@ class CartController extends Controller
         
         // Check stock
         if ($product->stok_tersedia < $quantity) {
+            if ($request->ajax()) {
+                return response()->json(['status' => 'error', 'message' => 'Stok tidak mencukupi'], 400);
+            }
             return back()->with('error', 'Stok tidak mencukupi');
         }
 
@@ -59,6 +62,14 @@ class CartController extends Controller
         }
 
         session(['cart' => $cart]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Produk ditambahkan ke keranjang',
+                'cart_count' => count($cart)
+            ]);
+        }
 
         return back()->with('success', 'Produk ditambahkan ke keranjang');
     }

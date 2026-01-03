@@ -40,7 +40,7 @@
         <div class="w-full md:w-1/2 relative">
             <div
                 class="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white aspect-video md:aspect-auto md:h-80 lg:h-96">
-                <img src="{{ asset('storage/images/Tempe.jpg') }}"
+                <img src="{{ asset('Tempe.jpg') }}"
                     alt="Tempe Premium"
                     class="w-full h-full object-cover transform hover:scale-105 transition duration-700">
             </div>

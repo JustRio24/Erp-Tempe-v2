@@ -7,10 +7,10 @@
     <div class="max-w-4xl w-full bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row-reverse">
 
         <div class="hidden md:block md:w-1/2 relative bg-primary">
-            <img src="https://images.unsplash.com/photo-1515543904379-3d757afe72e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            <img src="{{ asset('kedelai.webp') }}"
                 alt="Kedelai Berkualitas"
-                class="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay">
-            <div class="absolute inset-0 bg-gradient-to-t from-primary to-transparent opacity-90"></div>
+                class="absolute inset-0 w-full h-full object-cover opacity-50">
+            <div class="absolute "></div>
 
             <div class="absolute bottom-0 left-0 p-12 text-white">
                 <h2 class="text-3xl font-serif font-bold mb-2">Bergabung Bersama Kami</h2>
@@ -51,6 +51,13 @@
                     <input id="email" type="email" name="email" value="{{ old('email') }}" required
                         class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
                         placeholder="nama@email.com">
+                </div>
+
+                <div>
+                    <label for="whatsapp" class="block text-sm font-medium text-gray-700 mb-1">Nomor WhatsApp</label>
+                    <input id="whatsapp" type="tel" name="whatsapp" value="{{ old('whatsapp') }}" required
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none"
+                        placeholder="0812...">
                 </div>
 
                 <div>

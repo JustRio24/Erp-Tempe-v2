@@ -8,6 +8,7 @@
     <title>@yield('title', 'Tempe 3 Puteri') - Segar & Berkualitas</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" type="image/webp" href="{{ asset('logo.webp') }}">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
@@ -43,12 +44,8 @@
                 <div class="flex-shrink-0 flex items-center">
                     <a href="{{ route('home') }}" class="flex items-center gap-2.5 group">
                         <div
-                            class="w-10 h-10 bg-green-50 text-primary rounded-full flex items-center justify-center border border-green-100 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                            </svg>
+                            class="w-10 h-10 text-primary rounded-full flex items-center justify-center border border-green-100 group-hover:text-white transition-colors duration-300">
+                            <img src="{{ asset('logo.webp') }}" style="height: 40px; margin-right: 10px;">
                         </div>
                         <div class="flex flex-col">
                             <h1 class="text-xl font-serif font-bold text-gray-900 leading-none">Tempe 3 Puteri</h1>
@@ -64,14 +61,24 @@
                     <a href="{{ route('catalog.index') }}"
                         class="text-sm font-medium {{ request()->routeIs('catalog.*') ? 'text-primary' : 'text-gray-500 hover:text-gray-900' }} transition">Produk</a>
                     <a href="{{ route('cart.index') }}"
+                        id="cart-link"
                         class="relative text-sm font-medium {{ request()->routeIs('cart.*') ? 'text-primary' : 'text-gray-500 hover:text-gray-900' }} transition">
                         Keranjang
-                        @if(session('cart') && count(session('cart')) > 0)
-                        <span
-                            class="absolute -top-2 -right-3 bg-secondary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">{{
-                            count(session('cart')) }}</span>
-                        @endif
+                        <div id="cart-badge-container">
+                            @if(session('cart') && count(session('cart')) > 0)
+                            <span
+                                class="cart-badge absolute -top-2 -right-3 bg-secondary text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">{{
+                                count(session('cart')) }}</span>
+                            @endif
+                        </div>
                     </a>
+
+                    @auth
+                        @if(!auth()->user()->is_admin)
+                        <a href="{{ route('history.index') }}"
+                            class="text-sm font-medium {{ request()->routeIs('history.*') ? 'text-primary' : 'text-gray-500 hover:text-gray-900' }} transition">Riwayat</a>
+                        @endif
+                    @endauth
 
                     <div class="flex items-center gap-3 pl-6 border-l border-gray-200">
                         @auth
@@ -94,14 +101,6 @@
                                         <a href="{{ route('dashboard') }}" 
                                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-primary transition-colors">
                                             Admin Dashboard
-                                        </a>
-                                    @endif
-                            
-                                    {{-- MENU KHUSUS USER BIASA (is_admin = 0) --}}
-                                    @if(!auth()->user()->is_admin)
-                                        <a href="{{ route('history.index') }}" 
-                                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-primary transition-colors">
-                                            Riwayat Pesanan
                                         </a>
                                     @endif
                             
@@ -131,11 +130,13 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
-                        @if(session('cart') && count(session('cart')) > 0)
-                        <span
-                            class="absolute -top-1 -right-1 bg-secondary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full">{{
-                            count(session('cart')) }}</span>
-                        @endif
+                        <div id="cart-badge-container-mobile">
+                            @if(session('cart') && count(session('cart')) > 0)
+                            <span
+                                class="cart-badge-mobile absolute -top-1 -right-1 bg-secondary text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full">{{
+                                count(session('cart')) }}</span>
+                            @endif
+                        </div>
                     </a>
                     <button id="mobile-menu-btn" type="button"
                         class="text-gray-500 hover:text-gray-900 focus:outline-none">
@@ -154,6 +155,13 @@
                     class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('home') ? 'bg-green-50 text-primary' : 'text-gray-600 hover:bg-gray-50' }}">Beranda</a>
                 <a href="{{ route('catalog.index') }}"
                     class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('catalog.*') ? 'bg-green-50 text-primary' : 'text-gray-600 hover:bg-gray-50' }}">Produk</a>
+
+                @auth
+                    @if(!auth()->user()->is_admin)
+                    <a href="{{ route('history.index') }}"
+                        class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('history.*') ? 'bg-green-50 text-primary' : 'text-gray-600 hover:bg-gray-50' }}">Riwayat Pesanan</a>
+                    @endif
+                @endauth
 
                 <div class="border-t border-gray-100 my-2 pt-2">
                     @auth
