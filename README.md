@@ -13,17 +13,21 @@ Sistem ERP (Enterprise Resource Planning) yang dirancang khusus untuk UMKM Tempe
 - **Laporan Keuangan**: Pencatatan pengeluaran manual dan laporan laba rugi otomatis dari data penjualan.
 
 ### 🛒 Modul Pelanggan (E-commerce)
-- **Katalog Produk**: Tampilan produk premium dengan detail lengkap dan info stok.
-- **Sistem Keranjang**: Penambahan produk ke keranjang belanja dengan perhitungan harga grosir otomatis.
-- **Guest Checkout**: Pelanggan dapat berbelanja tanpa harus login (registrasi opsional).
-- **Simulasi Pembayaran**: Pilihan metode Transfer Bank dan COD (Cash on Delivery).
+- **Katalog Produk**: Tampilan produk premium dengan info stok real-time dan feedback **AJAX "Add to Cart"** (tanpa reload).
+- **Registrasi WhatsApp**: Sistem pendaftaran pengguna dengan integrasi nomor WhatsApp untuk koordinasi pengiriman.
+- **Smart Checkout**: 
+    - Auto-fill data pembeli (Nama, Email, WhatsApp) untuk pengguna terdaftar.
+    - Validasi alamat kondisional (hanya muncul jika memilih metode kurir).
+- **Riwayat Pesanan**: Dashboard khusus bagi pelanggan untuk memantau status pesanan dan melakukan pembayaran ulang via Snap Midtrans.
+- **Sistem Keranjang**: Perhitungan harga grosir otomatis secara transparan.
+- **Pembayaran Terintegrasi**: Integrasi dengan **Midtrans** (Transfer Bank) dan opsi COD.
 
 ## 🛠️ Tech Stack
 - **Framework**: Laravel 12
 - **Frontend**: Blade Templates, Tailwind CSS (via Breeze)
 - **Database**: MySQL
 - **Asset Bundler**: Vite
-- **Integrasi API**: WeatherAPI.com (Prakiraan Cuaca)
+- **Integrasi API**: WeatherAPI.com (Cuaca) & **Midtrans Snap SDK** (Gateway Pembayaran)
 
 ## 🚀 Langkah Instalasi
 
