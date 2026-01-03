@@ -28,7 +28,22 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // --- MODIFIKASI DIMULAI DARI SINI ---
+        
+        // Ambil data user yang sedang login
+        $user = $request->user();
+
+        // Cek jika user BUKAN admin (is_admin = 0)
+        if ($user->is_admin == 0) {
+            // Arahkan ke halaman riwayat pembelian
+            // Pastikan Anda memiliki route dengan nama 'history.index' di web.php
+            return redirect()->route('history.index');
+        }
+
+        // Jika Admin, arahkan ke dashboard (default)
         return redirect()->intended(route('dashboard', absolute: false));
+        
+        // --- AKHIR MODIFIKASI ---
     }
 
     /**

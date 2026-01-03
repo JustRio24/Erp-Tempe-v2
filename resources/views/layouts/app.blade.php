@@ -88,12 +88,24 @@
 
                             <div class="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
                                 <div class="bg-white rounded-md shadow-lg py-1 border border-gray-100">
+                                    
+                                    {{-- MENU KHUSUS ADMIN --}}
                                     @if(auth()->user()->is_admin)
-                                    <a href="{{ route('admin.dashboard') }}"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-primary transition-colors">
-                                        Admin Dashboard
-                                    </a>
+                                        <a href="{{ route('dashboard') }}" 
+                                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-primary transition-colors">
+                                            Admin Dashboard
+                                        </a>
                                     @endif
+                            
+                                    {{-- MENU KHUSUS USER BIASA (is_admin = 0) --}}
+                                    @if(!auth()->user()->is_admin)
+                                        <a href="{{ route('history.index') }}" 
+                                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-primary transition-colors">
+                                            Riwayat Pesanan
+                                        </a>
+                                    @endif
+                            
+                                    {{-- LOGOUT (Muncul untuk semua) --}}
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit"

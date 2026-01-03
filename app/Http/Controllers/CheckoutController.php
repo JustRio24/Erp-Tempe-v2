@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
@@ -73,6 +74,7 @@ class CheckoutController extends Controller
 
             // Create Order
             $order = Order::create([
+                'user_id' => Auth::id(),
                 'nama_pembeli' => $request->nama_pembeli,
                 'email_pembeli' => $request->email_pembeli,
                 'telepon_pembeli' => $request->telepon_pembeli,

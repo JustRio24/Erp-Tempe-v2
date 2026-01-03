@@ -39,12 +39,21 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            // Default 'is_admin' biasanya sudah 0 dari database, jadi aman.
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
+        // --- LOGIKA PENGALIHAN (REDIRECT) ---
+        
+        // Jika User Biasa (is_admin = 0), arahkan ke Home (/)
+        if ($user->is_admin == 0) {
+            return redirect('/'); 
+        }
+
+        // Jika Admin (is_admin = 1), tetap ke Dashboard
         return redirect(route('dashboard', absolute: false));
     }
 }
