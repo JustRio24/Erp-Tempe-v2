@@ -27,7 +27,12 @@ class ProductionController extends Controller
         $products = Product::where('is_active', true)
             ->with('consumptions.material')
             ->get();
-        return view('admin.production.create', compact('products'));
+            
+        $weatherService = new \App\Services\WeatherService();
+        $forecast = $weatherService->getForecast();
+        $todayWeather = $forecast[0]['klasifikasi'] ?? 'Normal';
+        
+        return view('admin.production.create', compact('products', 'todayWeather'));
     }
 
     public function store(Request $request)

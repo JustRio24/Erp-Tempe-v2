@@ -117,6 +117,7 @@
                                                         <input type="number" name="products[{{ $loop->index }}][jumlah]"
                                                             class="qty-input w-full pl-3 pr-10 py-2 rounded-lg border border-gray-200 text-sm focus:border-primary focus:ring-1 focus:ring-primary disabled:bg-gray-50 disabled:cursor-not-allowed font-bold"
                                                             min="1" disabled placeholder="0"
+                                                            data-bom="{{ $product->consumptions->map(function($c) { return ['name' => $c->material->nama, 'amount' => $c->jumlah_konsumsi, 'unit' => $c->material->satuan, 'stock' => $c->material->stok_tersedia]; })->toJson() }}"
                                                             oninput="updateEstimation()">
                                                         <span
                                                             class="absolute right-3 top-2 text-xs text-gray-400 font-bold">{{
@@ -178,6 +179,34 @@
                     </div>
                 </div>
 
+                <!-- Rincian Bahan Baku Section -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wide">Rincian Bahan Baku</h4>
+                        <div class="flex items-center gap-1.5 px-2 py-1 bg-gray-50 rounded-lg border border-gray-100">
+                            <span class="text-[10px] font-bold text-gray-500">Cuaca:</span>
+                            <span class="text-[10px] font-bold text-primary">{{ $todayWeather }}</span>
+                        </div>
+                    </div>
+
+                    <div id="material-list" class="space-y-4">
+                        <p class="text-xs text-gray-400 text-center py-4 italic">Pilih produk untuk melihat rincian bahan.</p>
+                    </div>
+
+                    <div id="material-template" class="hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800 material-name"></p>
+                                <p class="text-[10px] text-gray-500">Stok: <span class="material-stock"></span></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-bold text-primary material-need"></p>
+                                <p class="text-[9px] font-bold material-status"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
                     <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-6">Workflow Produksi</h4>
 
@@ -226,41 +255,101 @@
 </div>
 
 <script>
-    function toggleInput(checkbox, index) {
-    const inputContainer = document.getElementById(`input-container-${index}`);
-    const inputs = document.querySelectorAll(`input[name="products[${index}][jumlah]"]`);
-    
-    inputs.forEach(input => {
-        input.disabled = !checkbox.checked;
-        if (checkbox.checked) {
-            inputContainer.classList.remove('opacity-50');
-            input.focus();
-            input.required = true;
-        } else {
-            inputContainer.classList.add('opacity-50');
-            input.value = '';
-            input.required = false;
-        }
-    });
-    updateEstimation();
-}
+    const WEATHER = "{{ $todayWeather }}";
 
-function updateEstimation() {
-    let total = 0;
-    const rows = document.querySelectorAll('tbody tr');
-    
-    rows.forEach(row => {
-        const checkbox = row.querySelector('input[type="checkbox"]');
-        const qtyInput = row.querySelector('.qty-input');
+    function toggleInput(checkbox, index) {
+        const inputContainer = document.getElementById(`input-container-${index}`);
+        const inputs = document.querySelectorAll(`input[name="products[${index}][jumlah]"]`);
         
-        if (checkbox && checkbox.checked) {
-            const hpp = parseFloat(checkbox.dataset.hpp) || 0;
-            const qty = parseFloat(qtyInput.value) || 0;
-            total += hpp * qty;
+        inputs.forEach(input => {
+            input.disabled = !checkbox.checked;
+            if (checkbox.checked) {
+                inputContainer.classList.remove('opacity-50');
+                input.focus();
+                input.required = true;
+            } else {
+                inputContainer.classList.add('opacity-50');
+                input.value = '';
+                input.required = false;
+            }
+        });
+        updateEstimation();
+    }
+
+    function updateEstimation() {
+        let totalCost = 0;
+        const requirements = {};
+        const rows = document.querySelectorAll('tbody tr');
+        
+        // Multiplier Ragi berdasarkan cuaca
+        let ragiMultiplier = 1.0;
+        if (WEATHER === 'Panas') ragiMultiplier = 0.90;
+        if (WEATHER === 'Dingin / Lembab') ragiMultiplier = 1.15;
+
+        rows.forEach(row => {
+            const checkbox = row.querySelector('input[type="checkbox"]');
+            const qtyInput = row.querySelector('.qty-input');
+            
+            if (checkbox && checkbox.checked) {
+                const qty = parseFloat(qtyInput.value) || 0;
+                
+                // Hitung Cost
+                const hpp = parseFloat(checkbox.dataset.hpp) || 0;
+                totalCost += hpp * qty;
+
+                // Hitung Material
+                const bom = JSON.parse(qtyInput.dataset.bom || '[]');
+                bom.forEach(item => {
+                    let amount = item.amount;
+                    if (item.name.toLowerCase().includes('ragi')) {
+                        amount *= ragiMultiplier;
+                    }
+
+                    if (!requirements[item.name]) {
+                        requirements[item.name] = {
+                            needed: 0,
+                            unit: item.unit,
+                            stock: item.stock
+                        };
+                    }
+                    requirements[item.name].needed += amount * qty;
+                });
+            }
+        });
+        
+        // Update Total Cost UI
+        document.getElementById('totalCost').innerText = 'Rp ' + totalCost.toLocaleString('id-ID');
+
+        // Update Material List UI
+        const materialList = document.getElementById('material-list');
+        const template = document.getElementById('material-template');
+        
+        if (Object.keys(requirements).length === 0) {
+            materialList.innerHTML = '<p class="text-xs text-gray-400 text-center py-4 italic">Pilih produk untuk melihat rincian bahan.</p>';
+            return;
         }
-    });
-    
-    document.getElementById('totalCost').innerText = 'Rp ' + total.toLocaleString('id-ID');
-}
+
+        materialList.innerHTML = '';
+        for (const [name, data] of Object.entries(requirements)) {
+            const clone = template.cloneNode(true);
+            clone.classList.remove('hidden');
+            clone.removeAttribute('id');
+            
+            clone.querySelector('.material-name').innerText = name;
+            clone.querySelector('.material-stock').innerText = `${data.stock} ${data.unit}`;
+            clone.querySelector('.material-need').innerText = `${data.needed.toFixed(2)} ${data.unit}`;
+            
+            const statusEl = clone.querySelector('.material-status');
+            if (data.needed > data.stock) {
+                statusEl.innerText = '⚠️ STOK KURANG';
+                statusEl.classList.add('text-red-500');
+            } else {
+                statusEl.innerText = '✅ CUKUP';
+                statusEl.classList.add('text-green-500');
+            }
+            
+            materialList.appendChild(clone);
+        }
+    }
 </script>
 @endsection
