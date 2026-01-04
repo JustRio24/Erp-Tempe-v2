@@ -47,8 +47,14 @@
         </div>
 
         <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="{{ URL::signedRoute('orders.invoice', $order->id) }}" class="px-8 py-3 bg-white border-2 border-primary text-primary font-bold rounded-xl hover:bg-green-50 transition flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Download Invoice
+            </a>
             <a href="{{ route('home') }}" class="px-8 py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition">
-                Kembali ke Beranda
+                Beranda
             </a>
             <a href="{{ route('catalog.index') }}" class="px-8 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-green-800 transition shadow-lg shadow-green-100">
                 Belanja Lagi

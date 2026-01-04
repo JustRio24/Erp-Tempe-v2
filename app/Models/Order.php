@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderStatusMail;
 
 class Order extends Model
 {
@@ -73,6 +75,15 @@ class Order extends Model
     {
         $this->status = $newStatus;
         $this->save();
+        
+        // Send Notification if email exists
+        if ($this->email_pembeli) {
+            try {
+                Mail::to($this->email_pembeli)->send(new OrderStatusMail($this));
+            } catch (\Exception $e) {
+                \Log::error('Gagal mengirim email notifikasi: ' . $e->getMessage());
+            }
+        }
         
         // Record income when order is completed
         if ($newStatus === 'selesai') {

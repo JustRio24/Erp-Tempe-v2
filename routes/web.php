@@ -12,6 +12,9 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\MaterialController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductionController;
+use App\Http\Controllers\InvoiceController;
+use App\Models\Order;
+
 
 // Customer-facing routes
 Route::get('/', [CatalogController::class, 'home'])->name('home');
@@ -65,7 +68,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // BOM Management (nested under products for clarity)
     Route::get('products/{product}/bom', [ProductController::class, 'bom'])->name('products.bom');
     Route::post('products/{product}/bom', [ProductController::class, 'updateBom'])->name('products.update-bom');
+
+    // Order Contact Redirect
+    Route::get('orders/{order}/contact', function (Order $order) {
+        $phone = $order->telepon_pembeli;
+        if (str_starts_with($phone, '0')) {
+            $phone = '62' . substr($phone, 1);
+        }
+        $message = "Halo " . $order->nama_pembeli . ", kami dari Tempe 3 Puteri ingin mengkonfirmasi pesanan #" . $order->nomor_pesanan;
+        return redirect()->away("https://wa.me/" . $phone . "?text=" . urlencode($message));
+    })->name('orders.contact');
 });
+
+// Public/Auth shared (Guests can access via Signed URLs)
+Route::get('/pesanan/{order}/invoice', [InvoiceController::class, 'download'])->name('orders.invoice');
 
 // Breeze default dashboard redirect
 Route::middleware('auth')->get('/dashboard', function () {

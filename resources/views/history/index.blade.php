@@ -70,6 +70,13 @@
                                     {{-- <a href="{{ route('history.show', $order->id) }}" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-bold rounded-lg hover:bg-gray-50 transition">
                                         Detail
                                     </a> --}}
+
+                                    <a href="{{ route('orders.invoice', $order->id) }}" class="px-4 py-2 border border-green-200 text-primary text-sm font-bold rounded-lg hover:bg-green-50 transition flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        Invoice
+                                    </a>
                                 </div>
                             </div>
                         </div>
