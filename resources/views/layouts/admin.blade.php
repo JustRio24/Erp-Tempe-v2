@@ -8,6 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/webp" href="{{ asset('logo.webp') }}">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
         rel="stylesheet">
@@ -73,12 +74,8 @@
         class="fixed md:relative z-30 w-64 h-full bg-[#1e4329] text-white flex flex-col transition-transform transform -translate-x-full md:translate-x-0 shadow-2xl flex-shrink-0">
 
         <div class="h-16 flex items-center gap-3 px-6 bg-[#173320] border-b border-white/5 shrink-0">
-            <div class="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center text-secondary">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                    </path>
-                </svg>
+            <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-secondary">
+                <img src="{{ asset('logo.webp') }}" style="height: 40px;">
             </div>
             <div>
                 <h2 class="font-serif font-bold text-lg tracking-wide leading-none">Admin Panel</h2>
