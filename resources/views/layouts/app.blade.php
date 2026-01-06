@@ -103,6 +103,11 @@
                                             Admin Dashboard
                                         </a>
                                     @endif
+
+                                    <a href="{{ route('profile.edit') }}" 
+                                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-primary transition-colors">
+                                        Profil Saya
+                                    </a>
                             
                                     {{-- LOGOUT (Muncul untuk semua) --}}
                                     <form method="POST" action="{{ route('logout') }}">
@@ -170,6 +175,8 @@
                     <a href="{{ route('admin.dashboard') }}"
                         class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">Admin Dashboard</a>
                     @endif
+                    <a href="{{ route('profile.edit') }}"
+                        class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50">Profil Saya</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit"
