@@ -335,9 +335,20 @@
             clone.classList.remove('hidden');
             clone.removeAttribute('id');
             
+            let displayUnit = data.unit;
+            let displayNeeded = data.needed;
+            let displayStock = data.stock;
+
+            // Konversi Ragi dari kg ke gram jika perlu
+            if (name.toLowerCase().includes('ragi') && data.unit.toLowerCase() === 'kg') {
+                displayUnit = 'gram';
+                displayNeeded = data.needed * 1000;
+                displayStock = data.stock * 1000;
+            }
+
             clone.querySelector('.material-name').innerText = name;
-            clone.querySelector('.material-stock').innerText = `${data.stock} ${data.unit}`;
-            clone.querySelector('.material-need').innerText = `${data.needed.toFixed(2)} ${data.unit}`;
+            clone.querySelector('.material-stock').innerText = `${displayStock.toLocaleString('id-ID')} ${displayUnit}`;
+            clone.querySelector('.material-need').innerText = `${displayNeeded.toLocaleString('id-ID', {minimumFractionDigits: 0, maximumFractionDigits: 2})} ${displayUnit}`;
             
             const statusEl = clone.querySelector('.material-status');
             if (data.needed > data.stock) {
