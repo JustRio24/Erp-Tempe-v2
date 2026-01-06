@@ -79,6 +79,7 @@ class CheckoutController extends Controller
                 'email_pembeli' => $request->email_pembeli,
                 'telepon_pembeli' => $request->telepon_pembeli,
                 'alamat_pembeli' => $request->alamat_pembeli ?? 'Ambil di Toko',
+                'total_item' => array_sum($cart),
                 'metode_pembayaran' => $request->metode_pembayaran,
                 'bank_tujuan' => null,
                 'metode_pengiriman' => $request->metode_pengiriman,
