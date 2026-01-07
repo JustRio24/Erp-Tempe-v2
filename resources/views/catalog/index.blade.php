@@ -43,7 +43,7 @@
                             class="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-1 mb-1">
                             {{ $product->nama }}</h3>
                     </a>
-                    <p class="text-gray-500 text-xs leading-relaxed line-clamp-2 h-8">{{ Str::limit($product->deskripsi,
+                    <p class="text-gray-500 text-xs leading-relaxed line-clamp-2 h-14">{{ Str::limit($product->deskripsi,
                         80) }}</p>
                 </div>
 
